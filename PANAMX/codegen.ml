@@ -31,16 +31,16 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type     context
   and i1_t       = L.i1_type     context
   and float_t    = L.double_type context
-  and string_t   = L.pointer_type (L.i8_type context)
-  and void_t     = L.void_type   context in
+  and void_t     = L.void_type   context 
+  and pointer_t  = L.pointer_type     in
 
   (* Return the LLVM type for a MicroC type *)
   let ltype_of_typ = function
-      A.Int   -> i32_t
-    | A.Bool  -> i1_t
-    | A.String -> string_t
-    | A.Float -> float_t
-    | A.Void  -> void_t
+      A.Int    -> i32_t
+    | A.Bool   -> i1_t
+    | A.String -> pointer_t i8_t
+    | A.Float  -> float_t
+    | A.Void   -> void_t
   in
 
   (* Create a map of global variables after creating each *)
@@ -112,7 +112,7 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder ((_, e) : sexpr) = match e with
-	SLiteral i  -> L.const_int i32_t i
+	      SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SStrLit s -> L.build_global_stringptr s "tmp" builder
       | SFliteral l -> L.const_float_of_string float_t l
@@ -123,45 +123,54 @@ let translate (globals, functions) =
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
-	  (match op with
-	    A.Add     -> L.build_fadd
-	  | A.Sub     -> L.build_fsub
-	  | A.Mult    -> L.build_fmul
-    | A.Div     -> L.build_fdiv
-    | A.Mod    -> L.build_frem
-	  | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-	  | A.Neq     -> L.build_fcmp L.Fcmp.One
-	  | A.Less    -> L.build_fcmp L.Fcmp.Olt
-	  | A.Leq     -> L.build_fcmp L.Fcmp.Ole
-	  | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-	  | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-	  | A.And | A.Or ->
-	      raise (Failure "internal error: semant should have rejected and/or on float")
-	  ) e1' e2' "tmp" builder
+        (match op with
+          A.Add     -> L.build_fadd
+        | A.Sub     -> L.build_fsub
+        | A.Mult    -> L.build_fmul
+        | A.Div     -> L.build_fdiv
+        | A.Mod     -> L.build_frem
+        | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+        | A.Neq     -> L.build_fcmp L.Fcmp.One
+        | A.Less    -> L.build_fcmp L.Fcmp.Olt
+        | A.Leq     -> L.build_fcmp L.Fcmp.Ole
+        | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+        | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+        | A.And | A.Or ->
+            raise (Failure "internal error: semant should have rejected and/or on float")
+        ) e1' e2' "tmp" builder
       | SBinop (e1, op, e2) ->
-	  let e1' = expr builder e1
-	  and e2' = expr builder e2 in
-	  (match op with
-	    A.Add     -> L.build_add
-	  | A.Sub     -> L.build_sub
-	  | A.Mult    -> L.build_mul
-          | A.Div     -> L.build_sdiv
-          | A.Mod     -> L.build_srem
-	  | A.And     -> L.build_and
-	  | A.Or      -> L.build_or
-	  | A.Equal   -> L.build_icmp L.Icmp.Eq
-	  | A.Neq     -> L.build_icmp L.Icmp.Ne
-	  | A.Less    -> L.build_icmp L.Icmp.Slt
-	  | A.Leq     -> L.build_icmp L.Icmp.Sle
-	  | A.Greater -> L.build_icmp L.Icmp.Sgt
-	  | A.Geq     -> L.build_icmp L.Icmp.Sge
-	  ) e1' e2' "tmp" builder
-      | SUnop(op, ((t, _) as e)) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+          A.Add     -> L.build_add
+        | A.Sub     -> L.build_sub
+        | A.Mult    -> L.build_mul
+        | A.Div     -> L.build_sdiv
+        | A.Mod     -> L.build_srem
+        | A.And     -> L.build_and
+        | A.Or      -> L.build_or
+        | A.Equal   -> L.build_icmp L.Icmp.Eq
+        | A.Neq     -> L.build_icmp L.Icmp.Ne
+        | A.Less    -> L.build_icmp L.Icmp.Slt
+        | A.Leq     -> L.build_icmp L.Icmp.Sle
+        | A.Greater -> L.build_icmp L.Icmp.Sgt
+        | A.Geq     -> L.build_icmp L.Icmp.Sge
+        ) e1' e2' "tmp" builder
+      | SUnop(op, ((t, ex) as e)) ->
           let e' = expr builder e in
-	  (match op with
-	    A.Neg when t = A.Float -> L.build_fneg
-	  | A.Neg                  -> L.build_neg
-          | A.Not                  -> L.build_not) e' "tmp" builder
+          (match op with
+            A.Neg when t = A.Float -> L.build_fneg e' "tmp" builder
+          | A.Neg                  -> L.build_neg e' "tmp" builder
+          | A.Not                  -> L.build_not e' "tmp" builder
+          | A.Inc                  -> 
+            L.build_store (L.build_add e' (L.const_int i32_t 1) "tmp" builder) (lookup (match ex with 
+              SId id -> id 
+            | _ -> raise (Failure "increment error"))) builder
+          | A.Dec                  -> 
+            L.build_store (L.build_sub e' (L.const_int i32_t 1) "tmp" builder) (lookup (match ex with 
+              SId id -> id 
+            | _ -> raise (Failure "decrement error"))) builder
+          ) 
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
      "printf" builder

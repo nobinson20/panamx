@@ -110,6 +110,8 @@ let check (globals, functions) =
           let ty = match op with
               Neg when t = Int || t = Float || t = String -> t
           | Not when t = Bool -> Bool
+          | Inc when t = Int || t = Float -> t
+          | Dec when t = Int || t = Float -> t
           | _ -> raise (Failure ("illegal unary operator " ^
                                  string_of_uop op ^ string_of_typ t ^
                                  " in " ^ string_of_expr ex))
