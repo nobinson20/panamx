@@ -18,7 +18,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
-%right ASSIGN INCREMENT DECREMENT
+%right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
@@ -97,8 +97,6 @@ expr:
   | expr TIMES  expr { Binop($1, Mult,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
   | expr MODULO expr { Binop($1, Mod,   $3)   }
-  | expr INCREMENT   { Unop($1, Inc)         }
-  | expr DECREMENT   { Unop($1, Dec)         }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }
