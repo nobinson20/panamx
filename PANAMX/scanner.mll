@@ -1,6 +1,6 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for PANAMX *)
 
-{ open Microcparse }
+{ open Parser }
 
 let digit = ['0' - '9']
 let digits = digit+
