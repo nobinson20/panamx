@@ -4,7 +4,8 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MODULO INCREMENT DECREMENT ASSIGN
+
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID
 %token <int> LITERAL
@@ -17,7 +18,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
-%right ASSIGN
+%right ASSIGN INCREMENT DECREMENT
 %left OR
 %left AND
 %left EQ NEQ
@@ -87,7 +88,7 @@ expr_opt:
 
 expr:
     LITERAL          { Literal($1)            }
-  | FLIT	     { Fliteral($1)           }
+  | FLIT	           { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
   | STRLIT           { StrLit($1)             }
   | ID               { Id($1)                 }
@@ -109,6 +110,8 @@ expr:
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
   | ID ASSIGN expr   { Assign($1, $3)         }
+  | expr INCREMENT   { Unop(Inc, $1)          }
+  | expr DECREMENT   { Unop(Dec, $1)          }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
 
