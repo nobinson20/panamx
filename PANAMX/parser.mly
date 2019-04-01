@@ -4,6 +4,7 @@
 open Ast
 %}
 
+
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID
@@ -24,6 +25,7 @@ open Ast
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE MODULO
+%left INCREMENT DECREMENT
 %right NOT
 
 %%
@@ -95,6 +97,8 @@ expr:
   | expr TIMES  expr { Binop($1, Mult,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
   | expr MODULO expr { Binop($1, Mod,   $3)   }
+  | expr INCREMENT   { Unop($1, Inc)         }
+  | expr DECREMENT   { Unop($1, Dec)         }
   | expr EQ     expr { Binop($1, Equal, $3)   }
   | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }
