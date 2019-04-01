@@ -1,9 +1,8 @@
 #!/bin/sh
 
-# Regression testing script for panamx
-# Step through a list of files
-#  Compile, run, and check the output of each expected-to-work test
-#  Compile and check the error of each expected-to-fail test
+# Add customized test file here
+files="tests/test-incdec.mc tests/fail-assign1.mc"
+
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
@@ -169,13 +168,6 @@ then
     echo "Could not find printbig.o"
     echo "Try \"make printbig.o\""
     exit 1
-fi
-
-if [ $# -ge 1 ]
-then
-    files=$@
-else
-    files="tests/test-*.mc tests/fail-*.mc"
 fi
 
 for file in $files

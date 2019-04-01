@@ -58,5 +58,5 @@ and comment = parse
 | _    { comment lexbuf }
 
 and line_comment = parse
-  "\n" { token lexbuf }
+  '\n' { token lexbuf }
 | _    { line_comment lexbuf }
