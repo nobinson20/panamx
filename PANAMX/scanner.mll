@@ -19,6 +19,8 @@ rule token = parse
 | '*'      { TIMES }
 | '/'      { DIVIDE }
 | '%'      { MODULO }
+| "++"     { INCREMENT }
+| "--"     { DECREMENT }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
