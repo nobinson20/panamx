@@ -1,4 +1,4 @@
-(* Semantic checking for the MicroC compiler *)
+(* Semantic checking for the PANAMX compiler *)
 
 open Ast
 open Sast
@@ -41,8 +41,8 @@ let check (globals, functions) =
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                                  ("printb", Bool);
                                                  ("prints", String);
-			                         ("printf", Float);
-			                         ("printbig", Int) ]
+			                                           ("printf", Float);
+			                                           ("printbig", Int) ]
   in
 
   (* Add function name to symbol table *)

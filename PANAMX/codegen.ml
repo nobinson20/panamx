@@ -171,19 +171,27 @@ let translate (globals, functions) =
               SId id -> id 
             | _ -> raise (Failure "decrement error"))) builder
           ) 
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
-	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
-     "printf" builder
-
+      | SCall ("print", [e])
+          (* (match tt with
+            A.Int 
+          | A.Bool -> L.build_call printf_func 
+              [| int_format_str ; (expr builder e) |] "printf" builder
+          | A.Float -> L.build_call printf_func 
+              [| float_format_str ; (expr builder e) |] "printf" builder
+          | A.String -> L.build_call printf_func 
+              [| string_format_str; (expr builder e) |] "printf" builder
+          | _ -> raise (Failure "cannot print")) *)
+      | SCall ("printb", [e]) ->
+	      L.build_call printf_func [| int_format_str ; (expr builder e) |]
+          "printf" builder
+      | SCall ("printf", [e]) ->
+        L.build_call printf_func [| float_format_str ; (expr builder e) |]
+          "printf" builder
       | SCall ("prints", [e]) ->
         L.build_call printf_func [| string_format_str; (expr builder e) |]
           "printf" builder
-
       | SCall ("printbig", [e]) ->
 	  L.build_call printbig_func [| (expr builder e) |] "printbig" builder
-      | SCall ("printf", [e]) ->
-	  L.build_call printf_func [| float_format_str ; (expr builder e) |]
-	    "printf" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in

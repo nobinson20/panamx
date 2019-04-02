@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # Add customized test file here
-files="tests/test-incdec.mc tests/fail-assign1.mc"
+files="tests/test-printstr.mc tests/test-ops3.mc tests/test-incdec.mc 
+tests/fail-assign1.mc"
 
 
 # Path to the LLVM interpreter
