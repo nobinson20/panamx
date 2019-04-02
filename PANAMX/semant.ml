@@ -123,11 +123,10 @@ let check (globals, functions) =
           let same = t1 = t2 in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
-            Add | Sub | Mult | Div | Mod when same && t1 = Int   -> Int
-          | Add | Sub | Mult | Div | Mod when same && t1 = Float -> Float
-          | Equal | Neq            when same               -> Bool
-          | Less | Leq | Greater | Geq
-                     when same && (t1 = Int || t1 = Float) -> Bool
+            Add | Sub | Mult | Div | Mod when same && t1 = Int -> Int
+          | Add | Sub | Mult | Div | Mod when t1 = Float || t2 = Float -> Float
+          | Equal | Neq when same -> Bool
+          | Less | Leq | Greater | Geq when same && (t1 = Int || t1 = Float) -> Bool
           | And | Or when same && t1 = Bool -> Bool
           | _ -> raise (
 	      Failure ("illegal binary operator " ^

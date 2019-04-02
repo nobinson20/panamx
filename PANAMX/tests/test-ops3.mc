@@ -1,4 +1,6 @@
 int main() {
-    print(3 + 4);
+    double d;
+    d = -6.5 / 2;
+    printf(d);
     return 0;
 }

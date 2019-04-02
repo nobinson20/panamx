@@ -42,7 +42,7 @@ rule token = parse
 | "int"    { INT }
 | "bool"   { BOOL }
 | "string" { STRING }
-| "float"  { FLOAT }
+| "double" { FLOAT }
 | "void"   { VOID }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
