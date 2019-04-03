@@ -1,8 +1,8 @@
 int main()
 {
-  float a;
-  float b;
-  float c;
+  double a;
+  double b;
+  double c;
   a = 3.14159267;
   b = -2.71828;
   c = a + b;

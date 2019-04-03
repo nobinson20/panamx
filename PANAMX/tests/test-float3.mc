@@ -1,4 +1,4 @@
-void testfloat(float a, float b)
+void testfloat(double a, double b)
 {
   printf(a + b);
   printf(a - b);
@@ -16,8 +16,8 @@ void testfloat(float a, float b)
 
 int main()
 {
-  float c;
-  float d;
+  double c;
+  double d;
 
   c = 42.0;
   d = 3.14159;

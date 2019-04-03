@@ -138,6 +138,16 @@ let translate (globals, functions) =
           | A.Greater -> L.build_icmp L.Icmp.Sgt
           | A.Geq     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
+      | SBinop (e1, op, e2) when fst e1 = A.Bool && fst e2 = A.Bool ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+          (match op with
+            A.And   -> L.build_and
+          | A.Or    -> L.build_or
+          | A.Equal -> L.build_icmp L.Icmp.Eq
+          | A.Neq   -> L.build_icmp L.Icmp.Ne
+          | _       -> raise (Failure "invalid operation on bool")
+          ) e1' e2' "tmp" builder
       | SBinop (e1, op, e2) ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in
