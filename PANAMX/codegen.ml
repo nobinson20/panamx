@@ -24,7 +24,7 @@ let translate (globals, functions) =
 
   (* Create the LLVM compilation module into which
      we will generate code *)
-  let the_module = L.create_module context "MicroC" in
+  let the_module = L.create_module context "Panamx" in
 
   (* Get types from the context *)
   let i32_t      = L.i32_type    context
@@ -32,15 +32,17 @@ let translate (globals, functions) =
   and i1_t       = L.i1_type     context
   and float_t    = L.double_type context
   and void_t     = L.void_type   context 
-  and pointer_t  = L.pointer_type     in
+  and pointer_t  = L.pointer_type 
+  and array_t    = L.array_type       in
 
   (* Return the LLVM type for a MicroC type *)
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int    -> i32_t
     | A.Bool   -> i1_t
     | A.String -> pointer_t i8_t
     | A.Float  -> float_t
     | A.Void   -> void_t
+    | A.Array_type(ty, len) -> array_t (ltype_of_typ ty) len
   in
 
   (* Create a map of global variables after creating each *)
@@ -111,13 +113,21 @@ let translate (globals, functions) =
     in
 
     (* Construct code for an expression; return its value *)
-    let rec expr builder ((_, e) : sexpr) = match e with
+    let rec expr builder ((_ as ty, e) : sexpr) = match e with
 	      SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
-      | SStrLit s -> L.build_global_stringptr s "tmp" builder
+      | SStrLit s   -> L.build_global_stringptr s "tmp" builder
       | SFliteral l -> L.const_float_of_string float_t l
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
+      | SArrayLit e -> let llty = 
+        match ty with
+            A.Array_type(tty, len) -> array_t (ltype_of_typ tty) len
+          | _ -> raise (Failure "invalid array type") 
+        in L.const_array llty (Array.of_list (List.map (expr builder) e))
+      | SArrayIndex (id, e) -> let idx = expr builder e in 
+        let p = L.build_gep (lookup id) [| L.const_int i32_t 0; idx |] "tmp" builder 
+        in L.build_load p "tmp" builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop (e1, op, e2) when fst e1 = A.Int && fst e2 = A.Int ->
@@ -207,11 +217,11 @@ let translate (globals, functions) =
         L.build_call printf_func [| string_format_str; (expr builder e) |]
           "printf" builder
       | SCall ("printbig", [e]) ->
-	  L.build_call printbig_func [| (expr builder e) |] "printbig" builder
+	      L.build_call printbig_func [| (expr builder e) |] "printbig" builder
       | SCall (f, args) ->
-         let (fdef, fdecl) = StringMap.find f function_decls in
-	 let llargs = List.rev (List.map (expr builder) (List.rev args)) in
-	 let result = (match fdecl.styp with
+        let (fdef, fdecl) = StringMap.find f function_decls in
+          let llargs = List.rev (List.map (expr builder) (List.rev args)) in
+          let result = (match fdecl.styp with
                         A.Void -> ""
                       | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list llargs) result builder

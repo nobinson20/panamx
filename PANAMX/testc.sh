@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Add customized test file here
-files="tests/test-ops3.mc"
+files="tests/test-array1.mc tests/test-array2.mc"
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"

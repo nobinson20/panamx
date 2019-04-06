@@ -12,3 +12,4 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 1. print strings
 2. inc / dec
 3. double + int
+4. array for int, bool, double & array index

@@ -5,7 +5,8 @@ open Ast
 %}
 
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
+%token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID
 %token <int> LITERAL
@@ -55,11 +56,15 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
+    primitive_type { $1 }
+  | STRING    { String }
+  | VOID      { Void }
+  | primitive_type LBRACKET LITERAL RBRACKET { Array_type($1, $3) }
+
+primitive_type:
     INT   { Int   }
   | BOOL  { Bool  }
-  | STRING { String }
   | FLOAT { Float }
-  | VOID  { Void  }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -87,10 +92,7 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-    LITERAL          { Literal($1)            }
-  | FLIT	           { Fliteral($1)           }
-  | BLIT             { BoolLit($1)            }
-  | STRLIT           { StrLit($1)             }
+    literals         { $1                     }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
@@ -112,6 +114,26 @@ expr:
   | expr DECREMENT   { Unop(Dec, $1)          }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
+  | ID LBRACKET expr RBRACKET { ArrayIndex($1, $3) }
+
+literals:
+    STRLIT { StrLit($1) }
+  | prim_lit   { $1 }
+  | array_lit  { $1 } /*
+  | matrix_lit { $1 }*/
+
+prim_lit:
+    LITERAL { Literal($1)  }
+  | FLIT	  { Fliteral($1) }
+  | BLIT    { BoolLit($1)  }
+
+array_lit:
+    LBRACKET array_lit_list RBRACKET { ArrayLit($2) }
+
+array_lit_list:
+    /* nothing */ { [] }
+  | prim_lit { [$1] }
+  | prim_lit COMMA array_lit_list { $1 :: $3 }
 
 args_opt:
     /* nothing */ { [] }

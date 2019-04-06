@@ -6,9 +6,9 @@ open Sast
 module StringMap = Map.Make(String)
 
 (* Semantic checking of the AST. Returns an SAST if successful,
-   throws an exception if something is wrong.
+  throws an exception if something is wrong.
 
-   Check each global variable, then check each function *)
+  Check each global variable, then check each function *)
 
 let check (globals, functions) =
 
@@ -147,6 +147,26 @@ let check (globals, functions) =
           in
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
+      | ArrayLit elements ->
+        let len = List.length elements in
+        if len = 0 then raise (Failure ("empty array"))
+        else let selem = List.map expr elements in 
+          let ty = fst (List.hd selem) in 
+            if List.fold_left (fun x y -> x && (ty = fst y)) true selem
+            then let tyy = match ty with
+                            Int   -> Array_type(Int, len)
+                          | Bool  -> Array_type(Bool, len)
+                          | Float -> Array_type(Float, len)
+                          | _     -> raise (Failure ("invalid array type"))
+              in (tyy, SArrayLit(selem))
+            else raise (Failure ("inconsistent array type"))
+      | ArrayIndex(id, e) -> 
+        let (tt, e') = expr e in
+        if tt != Int then raise (Failure ("index must be integer"))
+        else let (ty, _) = match (type_of_identifier id) with
+                Array_type(tyy, len) -> (tyy, len)
+              | _ -> raise (Failure ("index can only be used on array/matrix"))
+        in (ty, SArrayIndex(id, (tt, e')))
     in
 
     let check_bool_expr e =

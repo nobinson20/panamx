@@ -14,6 +14,8 @@ and sx =
   | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
+  | SArrayLit of sexpr list
+  | SArrayIndex of string * sexpr
 
 type sstmt =
     SBlock of sstmt list
@@ -50,6 +52,8 @@ let rec string_of_sexpr (t, e) =
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
+  | SArrayIndex (s, i) -> s ^ "[" ^ (string_of_sexpr i) ^ "]"
+  | _ -> "array"
 				  ) ^ ")"
 
 let rec string_of_sstmt = function
