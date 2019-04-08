@@ -5,7 +5,8 @@ type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Ge
 
 type uop = Neg | Not | Inc | Dec
 
-type typ = Int | Bool | String | Float | Void | Array_type of typ * int
+type typ = Int | Bool | String | Float | Void | 
+           Array_type of typ * int | Matrix of typ * int * int
 
 type bind = typ * string
 
@@ -22,6 +23,7 @@ type expr =
   | Noexpr
   | ArrayLit of expr list
   | ArrayIndex of string * expr
+  | MatLit of expr list list
 
 type stmt =
     Block of stmt list
@@ -80,6 +82,7 @@ let rec string_of_expr = function
   | Noexpr -> ""
   | ArrayLit _ -> "array"
   | ArrayIndex (s, i) -> s ^ "[" ^ (string_of_expr i) ^ "]"
+  | MatLit _ -> "matrix"
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -101,11 +104,17 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | Array_type (ty, _) -> 
-    match ty with
+    (match ty with
       Int   -> "int[]"
     | Bool  -> "bool[]"
     | Float -> "double[]"
-    | _     -> ""
+    | _     -> "")
+  | Matrix (ty, _, _) ->
+    (match ty with
+      Int   -> "matrix<int>"
+    | Bool  -> "matrix<bool>"
+    | Float -> "matrix<double>"
+    | _     -> "")
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

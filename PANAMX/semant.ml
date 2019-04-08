@@ -147,6 +147,7 @@ let check (globals, functions) =
           in
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
+
       | ArrayLit elements ->
         let len = List.length elements in
         if len = 0 then raise (Failure ("empty array"))
@@ -154,12 +155,13 @@ let check (globals, functions) =
           let ty = fst (List.hd selem) in 
             if List.fold_left (fun x y -> x && (ty = fst y)) true selem
             then let tyy = match ty with
-                            Int   -> Array_type(Int, len)
-                          | Bool  -> Array_type(Bool, len)
-                          | Float -> Array_type(Float, len)
-                          | _     -> raise (Failure ("invalid array type"))
+                Int   -> Array_type(Int, len)
+              | Bool  -> Array_type(Bool, len)
+              | Float -> Array_type(Float, len)
+              | _     -> raise (Failure ("invalid array type"))
               in (tyy, SArrayLit(selem))
-            else raise (Failure ("inconsistent array type"))
+            else raise (Failure ("inconsistent array data type"))
+
       | ArrayIndex(id, e) -> 
         let (tt, e') = expr e in
         if tt != Int then raise (Failure ("index must be integer"))
@@ -167,6 +169,22 @@ let check (globals, functions) =
                 Array_type(tyy, len) -> (tyy, len)
               | _ -> raise (Failure ("index can only be used on array/matrix"))
         in (ty, SArrayIndex(id, (tt, e')))
+
+      | MatLit elts -> 
+        let rows = List.length elts in
+        if rows = 0 then raise (Failure ("empty matrix")) else
+        let cols = List.length (List.hd elts) in 
+        if cols = 0 then raise (Failure ("empty matrix")) else
+        let selts = List.map (List.map expr) elts
+        in let ty = fst (List.hd (List.hd selts))
+        in if List.fold_left (fun x y -> x && (List.fold_left (fun x y -> x && (ty = fst y)) true y)) true selts
+        then let tyy = match ty with
+            Int   -> Matrix(Int, rows, cols)
+          | Bool  -> Matrix(Bool, rows, cols)
+          | Float -> Matrix(Float, rows, cols)
+          | _     -> raise (Failure ("invalid matrix type"))
+          in (tyy, SMatLit(selts))
+        else raise (Failure ("inconsistent matrix data type"))
     in
 
     let check_bool_expr e =

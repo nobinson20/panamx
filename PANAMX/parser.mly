@@ -8,7 +8,7 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID
+%token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID MATRIX
 %token <int> LITERAL
 %token <bool> BLIT
 %token <string> STRLIT ID FLIT
@@ -60,6 +60,7 @@ typ:
   | STRING    { String }
   | VOID      { Void }
   | primitive_type LBRACKET LITERAL RBRACKET { Array_type($1, $3) }
+  | MATRIX LT primitive_type GT LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET { Matrix($3, $6, $9) }
 
 primitive_type:
     INT   { Int   }
@@ -119,11 +120,15 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   | LBRACKET arraylit RBRACKET { ArrayLit($2) }
   | ID LBRACKET expr RBRACKET { ArrayIndex($1, $3) }
+  | LBRACKET matrixlit RBRACKET { MatLit($2) }
 
 arraylit:
-    /* nothing */       { [] }
   | expr                { [$1] }
   | expr COMMA arraylit { $1 :: $3 }
+
+matrixlit:
+    /* nothing */           { [] }
+  | arraylit SEMI matrixlit { $1 :: $3 }
 
 args_opt:
     /* nothing */ { [] }

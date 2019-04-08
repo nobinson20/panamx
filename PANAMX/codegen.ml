@@ -43,6 +43,7 @@ let translate (globals, functions) =
     | A.Float  -> float_t
     | A.Void   -> void_t
     | A.Array_type(ty, len) -> array_t (ltype_of_typ ty) len
+    | A.Matrix(ty, row, col) -> array_t (array_t (ltype_of_typ ty) col) row
   in
 
   (* Create a map of global variables after creating each *)
@@ -120,14 +121,25 @@ let translate (globals, functions) =
       | SFliteral l -> L.const_float_of_string float_t l
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
+
       | SArrayLit e -> let llty = 
         match ty with
             A.Array_type(tty, len) -> array_t (ltype_of_typ tty) len
           | _ -> raise (Failure "invalid array type") 
         in L.const_array llty (Array.of_list (List.map (expr builder) e))
+
       | SArrayIndex (id, e) -> let idx = expr builder e in 
         let p = L.build_gep (lookup id) [| L.const_int i32_t 0; idx |] "tmp" builder 
         in L.build_load p "tmp" builder
+
+      | SMatLit e -> 
+        let llList = List.map (List.map (expr builder)) e
+        and (llty, col) = match ty with 
+            A.Matrix(tty, _, col) -> (ltype_of_typ tty, col)
+          | _ -> raise (Failure "invalid matrix type") 
+        in L.const_array (array_t llty col) (Array.of_list 
+          (List.map (L.const_array llty) (List.map Array.of_list llList)))
+
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop (e1, op, e2) when fst e1 = A.Int && fst e2 = A.Int ->
