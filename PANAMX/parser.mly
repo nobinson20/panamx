@@ -120,6 +120,7 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   | LBRACKET arraylit RBRACKET { ArrayLit($2) }
   | ID LBRACKET expr RBRACKET { ArrayIndex($1, $3) }
+  | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | LBRACKET matrixlit RBRACKET { MatLit($2) }
 
 arraylit:

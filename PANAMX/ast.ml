@@ -23,6 +23,7 @@ type expr =
   | Noexpr
   | ArrayLit of expr list
   | ArrayIndex of string * expr
+  | ArrayAssign of string * expr * expr
   | MatLit of expr list list
 
 type stmt =
@@ -82,6 +83,7 @@ let rec string_of_expr = function
   | Noexpr -> ""
   | ArrayLit _ -> "array"
   | ArrayIndex (s, i) -> s ^ "[" ^ (string_of_expr i) ^ "]"
+  | ArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_expr i) ^ "] = " ^ (string_of_expr e)
   | MatLit _ -> "matrix"
 
 let rec string_of_stmt = function

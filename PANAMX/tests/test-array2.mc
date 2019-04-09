@@ -1,9 +1,10 @@
 int main() {
     int i;
-    double[3] a;
-    a = [-1.23, 5.56, 7.62];
-    for (i = 0; i < 3; i++) {
-        printf(a[i]);
+    int[5] a;
+    a = [11,22,33,44,55];
+    a[3] = 666;
+    for (i = 0; i < 5; i++) {
+        print(a[i]);
     }
     return 0;
 }

@@ -162,13 +162,14 @@ let check (globals, functions) =
               in (tyy, SArrayLit(selem))
             else raise (Failure ("inconsistent array data type"))
 
-      | ArrayIndex(id, e) -> 
-        let (tt, e') = expr e in
-        if tt != Int then raise (Failure ("index must be integer"))
-        else let (ty, _) = match (type_of_identifier id) with
-                Array_type(tyy, len) -> (tyy, len)
-              | _ -> raise (Failure ("index can only be used on array/matrix"))
-        in (ty, SArrayIndex(id, (tt, e')))
+      | ArrayIndex(id, e) -> check_array_index id e 
+
+      | ArrayAssign(id, idx, e) -> let (tl, sarrayindex) = check_array_index id idx
+        and (tr, er) = expr e in 
+        let ty = if tl = tr then tl else raise (Failure ("array data type error"))
+        in (match sarrayindex with
+            SArrayIndex(_, (tt, ee)) -> (ty, SArrayAssign(id, (tt, ee), (tr, er)))
+          | _ -> raise (Failure ("should not happen")))
 
       | MatLit elts -> 
         let rows = List.length elts in
@@ -185,6 +186,14 @@ let check (globals, functions) =
           | _     -> raise (Failure ("invalid matrix type"))
           in (tyy, SMatLit(selts))
         else raise (Failure ("inconsistent matrix data type"))
+
+    and check_array_index (id : string) (e : expr) = 
+        let (tt, e') = expr e in
+        if tt != Int then raise (Failure ("index must be integer"))
+        else let (ty, _) = match (type_of_identifier id) with
+                Array_type(tyy, len) -> (tyy, len)
+              | _ -> raise (Failure ("index can only be used on array/matrix"))
+        in (ty, SArrayIndex(id, (tt, e')))
     in
 
     let check_bool_expr e =
