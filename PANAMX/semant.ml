@@ -187,13 +187,24 @@ let check (globals, functions) =
           in (tyy, SMatLit(selts))
         else raise (Failure ("inconsistent matrix data type"))
 
+      | MatIndex(id, i, j) -> check_matrix_index id i j
+
     and check_array_index (id : string) (e : expr) = 
         let (tt, e') = expr e in
         if tt != Int then raise (Failure ("index must be integer"))
-        else let (ty, _) = match (type_of_identifier id) with
-                Array_type(tyy, len) -> (tyy, len)
+        else let ty = match (type_of_identifier id) with
+                Array_type(tyy, _) -> tyy
               | _ -> raise (Failure ("index can only be used on array/matrix"))
         in (ty, SArrayIndex(id, (tt, e')))
+
+    and check_matrix_index (id : string) (i : expr) (j : expr) = 
+        let (ti, ei) = expr i 
+        and (tj, ej) = expr j in
+        if ti != Int || tj != Int then raise (Failure ("index must be integer"))
+        else let ty = match (type_of_identifier id) with
+                Matrix(tyy, _, _) -> tyy
+              | _ -> raise (Failure ("index can only be used on array/matrix"))
+        in (ty, SMatIndex(id, (ti, ei), (tj, ej)))
     in
 
     let check_bool_expr e =

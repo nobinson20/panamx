@@ -25,6 +25,7 @@ type expr =
   | ArrayIndex of string * expr
   | ArrayAssign of string * expr * expr
   | MatLit of expr list list
+  | MatIndex of string * expr * expr
 
 type stmt =
     Block of stmt list
@@ -85,6 +86,7 @@ let rec string_of_expr = function
   | ArrayIndex (s, i) -> s ^ "[" ^ (string_of_expr i) ^ "]"
   | ArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_expr i) ^ "] = " ^ (string_of_expr e)
   | MatLit _ -> "matrix"
+  | MatIndex (s, i, j) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]"
 
 let rec string_of_stmt = function
     Block(stmts) ->

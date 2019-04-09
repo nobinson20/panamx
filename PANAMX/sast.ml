@@ -18,6 +18,7 @@ and sx =
   | SArrayIndex of string * sexpr
   | SArrayAssign of string * sexpr * sexpr
   | SMatLit of sexpr list list
+  | SMatIndex of string * sexpr * sexpr
 
 type sstmt =
     SBlock of sstmt list
@@ -58,7 +59,8 @@ let rec string_of_sexpr (t, e) =
   | SArrayLit _ -> "array"
   | SArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_sexpr i) ^ "] = " ^ (string_of_sexpr e)
   | SMatLit _ -> "matrix"
-				  ) ^ ")"
+  | SMatIndex (s, i, j) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]"
+		) ^ ")"
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->

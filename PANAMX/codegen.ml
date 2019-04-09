@@ -146,6 +146,12 @@ let translate (globals, functions) =
         in L.const_array (array_t llty col) (Array.of_list 
           (List.map (L.const_array llty) (List.map Array.of_list llList)))
 
+      | SMatIndex (s, i, j) -> 
+        let i' = expr builder i 
+        and j' = expr builder j in
+        let p = L.build_gep (lookup s) [| L.const_int i32_t 0; i'; j' |] "tmp" builder 
+        in L.build_load p "tmp" builder
+
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop (e1, op, e2) when fst e1 = A.Int && fst e2 = A.Int ->
