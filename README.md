@@ -13,5 +13,6 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 2. inc / dec
 3. double + int
 4. array for int, bool, double & array index
-5. single array element assignment  a[3] = 12;
+5. array[3] = 12;
 6. matrix declaration & assignment & index
+7. matrix[1][2] = 3;

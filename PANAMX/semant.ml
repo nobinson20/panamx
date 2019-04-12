@@ -128,8 +128,7 @@ let check (globals, functions) =
           | Equal | Neq when same -> Bool
           | Less | Leq | Greater | Geq when same && (t1 = Int || t1 = Float) -> Bool
           | And | Or when same && t1 = Bool -> Bool
-          | _ -> raise (
-	      Failure ("illegal binary operator " ^
+          | _ -> raise (Failure ("illegal binary operator " ^
                        string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
                        string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
@@ -166,10 +165,10 @@ let check (globals, functions) =
 
       | ArrayAssign(id, idx, e) -> let (tl, sarrayindex) = check_array_index id idx
         and (tr, er) = expr e in 
-        let ty = if tl = tr then tl else raise (Failure ("array data type error"))
+        let ty = if tl = tr then tl else raise (Failure ("illegal assignment for array"))
         in (match sarrayindex with
             SArrayIndex(_, (tt, ee)) -> (ty, SArrayAssign(id, (tt, ee), (tr, er)))
-          | _ -> raise (Failure ("should not happen")))
+          | _ -> raise (Failure ("should not happen - array")))
 
       | MatLit elts -> 
         let rows = List.length elts in
@@ -188,6 +187,13 @@ let check (globals, functions) =
         else raise (Failure ("inconsistent matrix data type"))
 
       | MatIndex(id, i, j) -> check_matrix_index id i j
+
+      | MatAssign(id, i, j, e) -> let (tl, smatindex) = check_matrix_index id i j
+        and (tr, er) = expr e in
+        let ty = if tl = tr then tl else raise (Failure ("illegal assignment for matrix"))
+        in (match smatindex with
+              SMatIndex(_, (ti, ei), (tj, ej)) -> (ty, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
+            | _ -> raise (Failure ("should not happen - matrix")))
 
     and check_array_index (id : string) (e : expr) = 
         let (tt, e') = expr e in
@@ -218,12 +224,11 @@ let check (globals, functions) =
         Expr e -> SExpr (expr e)
       | If(p, b1, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt b2)
       | For(e1, e2, e3, st) ->
-	  SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
+	      SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
       | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
       | Return e -> let (t, e') = expr e in
         if t = func.typ then SReturn (t, e')
-        else raise (
-	  Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+        else raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
 		   string_of_typ func.typ ^ " in " ^ string_of_expr e))
 
 	    (* A block is correct if each statement is correct and nothing
@@ -243,7 +248,7 @@ let check (globals, functions) =
       sformals = func.formals;
       slocals  = func.locals;
       sbody = match check_stmt (Block func.body) with
-	SBlock(sl) -> sl
+	      SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
     }
   in (globals, List.map check_function functions)

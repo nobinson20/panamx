@@ -123,6 +123,7 @@ expr:
   | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
   | LBRACKET matrixlit RBRACKET { MatLit($2) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { MatIndex($1, $3, $6) }
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
 
 arraylit:
   | expr                { [$1] }
