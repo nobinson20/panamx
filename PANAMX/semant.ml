@@ -154,9 +154,9 @@ let check (globals, functions) =
           let ty = fst (List.hd selem) in 
             if List.fold_left (fun x y -> x && (ty = fst y)) true selem
             then let tyy = match ty with
-                Int   -> Array_type(Int, len)
-              | Bool  -> Array_type(Bool, len)
-              | Float -> Array_type(Float, len)
+                Int   -> Arrays(Int, len)
+              | Bool  -> Arrays(Bool, len)
+              | Float -> Arrays(Float, len)
               | _     -> raise (Failure ("invalid array type"))
               in (tyy, SArrayLit(selem))
             else raise (Failure ("inconsistent array data type"))
@@ -199,7 +199,7 @@ let check (globals, functions) =
         let (tt, e') = expr e in
         if tt != Int then raise (Failure ("index must be integer"))
         else let ty = match (type_of_identifier id) with
-                Array_type(tyy, _) -> tyy
+                Arrays(tyy, _) -> tyy
               | _ -> raise (Failure ("index can only be used on array/matrix"))
         in (ty, SArrayIndex(id, (tt, e')))
 

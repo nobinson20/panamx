@@ -42,7 +42,7 @@ let translate (globals, functions) =
     | A.String -> pointer_t i8_t
     | A.Float  -> float_t
     | A.Void   -> void_t
-    | A.Array_type(ty, len) -> array_t (ltype_of_typ ty) len
+    | A.Arrays(ty, len) -> array_t (ltype_of_typ ty) len
     | A.Matrix(ty, row, col) -> array_t (array_t (ltype_of_typ ty) col) row
   in
 
@@ -124,7 +124,7 @@ let translate (globals, functions) =
 
       | SArrayLit e -> let llty = 
         match ty with
-            A.Array_type(tty, len) -> array_t (ltype_of_typ tty) len
+            A.Arrays(tty, len) -> array_t (ltype_of_typ tty) len
           | _ -> raise (Failure "invalid array type") 
         in L.const_array llty (Array.of_list (List.map (expr builder) e))
 

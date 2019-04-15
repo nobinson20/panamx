@@ -59,7 +59,7 @@ typ:
     primitive_type { $1 }
   | STRING    { String }
   | VOID      { Void }
-  | primitive_type LBRACKET LITERAL RBRACKET { Array_type($1, $3) }
+  | primitive_type LBRACKET LITERAL RBRACKET { Arrays($1, $3) }
   | MATRIX LT primitive_type GT LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET { Matrix($3, $6, $9) }
 
 primitive_type:

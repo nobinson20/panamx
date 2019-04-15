@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Ge
 type uop = Neg | Not | Inc | Dec
 
 type typ = Int | Bool | String | Float | Void | 
-           Array_type of typ * int | Matrix of typ * int * int
+           Arrays of typ * int | Matrix of typ * int * int
 
 type bind = typ * string
 
@@ -109,7 +109,7 @@ let string_of_typ = function
   | String -> "string"
   | Float -> "float"
   | Void -> "void"
-  | Array_type (ty, _) -> 
+  | Arrays (ty, _) -> 
     (match ty with
       Int   -> "int[]"
     | Bool  -> "bool[]"
