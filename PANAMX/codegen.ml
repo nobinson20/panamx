@@ -114,7 +114,7 @@ let translate (globals, functions) =
     in
 
     (* Construct code for an expression; return its value *)
-    let rec expr builder ((_ as ty, e) : sexpr) = match e with
+    let rec expr builder ((ty, e) : sexpr) = match e with
 	      SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SStrLit s   -> L.build_global_stringptr s "tmp" builder
@@ -122,11 +122,7 @@ let translate (globals, functions) =
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
 
-      | SArrayLit e -> let llty = 
-        match ty with
-            A.Arrays(tty, len) -> array_t (ltype_of_typ tty) len
-          | _ -> raise (Failure "invalid array type") 
-        in L.const_array llty (Array.of_list (List.map (expr builder) e))
+      | SArrayLit e -> L.const_array (ltype_of_typ ty) (Array.of_list (List.map (expr builder) e))
 
       | SArrayIndex (id, e) -> let idx = expr builder e in 
         let p = L.build_gep (lookup id) [| L.const_int i32_t 0; idx |] "tmp" builder 
