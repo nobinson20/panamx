@@ -60,7 +60,7 @@ typ:
   | STRING    { String }
   | VOID      { Void }
   | primitive_type LBRACKET LITERAL RBRACKET { Arrays($1, $3) }
-  | MATRIX LT primitive_type GT LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET { Matrix($3, $6, $9) }
+  | MATRIX    { Matrix }
 
 primitive_type:
     INT   { Int   }
@@ -126,7 +126,7 @@ expr:
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
 
 arraylit:
-  | expr                { [$1] }
+    expr                { [$1] }
   | expr COMMA arraylit { $1 :: $3 }
 
 matrixlit:

@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Ge
 type uop = Neg | Not | Inc | Dec
 
 type typ = Int | Bool | String | Float | Void | 
-           Arrays of typ * int | Matrix of typ * int * int
+           Arrays of typ * int | Matrix
 
 type bind = typ * string
 
@@ -115,12 +115,7 @@ let string_of_typ = function
     | Bool  -> "bool[]"
     | Float -> "double[]"
     | _     -> "")
-  | Matrix (ty, _, _) ->
-    (match ty with
-      Int   -> "matrix<int>"
-    | Bool  -> "matrix<bool>"
-    | Float -> "matrix<double>"
-    | _     -> "")
+  | Matrix -> "matrix"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

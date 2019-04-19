@@ -33,7 +33,9 @@ let translate (globals, functions) =
   and float_t    = L.double_type context
   and void_t     = L.void_type   context 
   and pointer_t  = L.pointer_type 
-  and array_t    = L.array_type       in
+  and array_t    = L.array_type       
+  and matrix_t   = L.pointer_type (L.named_struct_type context "Matrix")
+  in
 
   (* Return the LLVM type for a MicroC type *)
   let rec ltype_of_typ = function
@@ -43,7 +45,7 @@ let translate (globals, functions) =
     | A.Float  -> float_t
     | A.Void   -> void_t
     | A.Arrays(ty, len) -> array_t (ltype_of_typ ty) len
-    | A.Matrix(ty, row, col) -> array_t (array_t (ltype_of_typ ty) col) row
+    | A.Matrix -> matrix_t
   in
 
   (* Create a map of global variables after creating each *)
@@ -60,18 +62,22 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
 
-  let printbig_t : L.lltype =
+  (* let printbig_t : L.lltype =
       L.function_type i32_t [| i32_t |] in
   let printbig_func : L.llvalue =
-      L.declare_function "printbig" printbig_t the_module in
+      L.declare_function "printbig" printbig_t the_module in *)
+
+  let build_matrix_empty_t : L.lltype =
+      L.function_type matrix_t [| i32_t; i32_t |] in
+  let build_matrix_empty_func : L.llvalue =
+      L.declare_function "buildMatrixEmpty" build_matrix_empty_t the_module in
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
       let name = fdecl.sfname
-      and formal_types =
-	Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+      and formal_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
       in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
@@ -136,11 +142,10 @@ let translate (globals, functions) =
 
       | SMatLit e -> 
         let llList = List.map (List.map (expr builder)) e
-        and (llty, col) = match ty with 
-            A.Matrix(tty, _, col) -> (ltype_of_typ tty, col)
-          | _ -> raise (Failure "invalid matrix type") 
-        in L.const_array (array_t llty col) (Array.of_list 
-          (List.map (L.const_array llty) (List.map Array.of_list llList)))
+        and rows = List.length e
+        and cols = List.length (List.hd e)
+        in L.build_call build_matrix_empty_func 
+          [| (L.const_int i32_t rows); (L.const_int i32_t cols) |] "init_matrix" builder
 
       | SMatIndex (s, i, j) -> 
         let i' = expr builder i 
@@ -243,8 +248,8 @@ let translate (globals, functions) =
       | SCall ("prints", [e]) ->
         L.build_call printf_func [| string_format_str; (expr builder e) |]
           "printf" builder
-      | SCall ("printbig", [e]) ->
-	      L.build_call printbig_func [| (expr builder e) |] "printbig" builder
+      (* | SCall ("printbig", [e]) ->
+	      L.build_call printbig_func [| (expr builder e) |] "printbig" builder *)
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
           let llargs = List.rev (List.map (expr builder) (List.rev args)) in

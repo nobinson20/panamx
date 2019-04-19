@@ -15,12 +15,12 @@ let check (globals, functions) =
   (* Verify a list of bindings has no void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
     List.iter (function
-	(Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
+	      (Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
       | _ -> ()) binds;
     let rec dups = function
         [] -> ()
       |	((_,n1) :: (_,n2) :: _) when n1 = n2 ->
-	  raise (Failure ("duplicate " ^ kind ^ " " ^ n1))
+	      raise (Failure ("duplicate " ^ kind ^ " " ^ n1))
       | _ :: t -> dups t
     in dups (List.sort (fun (_,a) (_,b) -> compare a b) binds)
   in
@@ -178,12 +178,7 @@ let check (globals, functions) =
         let selts = List.map (List.map expr) elts
         in let ty = fst (List.hd (List.hd selts))
         in if List.fold_left (fun x y -> x && (List.fold_left (fun x y -> x && (ty = fst y)) true y)) true selts
-        then let tyy = match ty with
-            Int   -> Matrix(Int, rows, cols)
-          | Bool  -> Matrix(Bool, rows, cols)
-          | Float -> Matrix(Float, rows, cols)
-          | _     -> raise (Failure ("invalid matrix type"))
-          in (tyy, SMatLit(selts))
+        then (Matrix, SMatLit(selts))
         else raise (Failure ("inconsistent matrix data type"))
 
       | MatIndex(id, i, j) -> check_matrix_index id i j
@@ -207,10 +202,7 @@ let check (globals, functions) =
         let (ti, ei) = expr i 
         and (tj, ej) = expr j in
         if ti != Int || tj != Int then raise (Failure ("index must be integer"))
-        else let ty = match (type_of_identifier id) with
-                Matrix(tyy, _, _) -> tyy
-              | _ -> raise (Failure ("index can only be used on array/matrix"))
-        in (ty, SMatIndex(id, (ti, ei), (tj, ej)))
+        else (Float, SMatIndex(id, (ti, ei), (tj, ej)))
     in
 
     let check_bool_expr e =

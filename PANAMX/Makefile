@@ -8,7 +8,7 @@
 # to test linking external code
 
 .PHONY : all
-all : panamx.native printbig.o
+all : panamx.native matrix.o
 
 # "make panamx.native" compiles the compiler
 #
@@ -26,12 +26,17 @@ panamx.native :
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff
+	rm -rf testall.log ocamlllvm *.diff matrix.o
 
 # Testing the "printbig" example
 
-printbig : printbig.c
-	cc -o printbig -DBUILD_TEST printbig.c
+# printbig : printbig.c
+# 	cc -o printbig -DBUILD_TEST printbig.c
+
+# Link the matrix.c to llvm
+
+matrix : matrix.c
+	cc -o matrix -DBUILD_TEST matrix.c
 
 # Building the tarball
 
