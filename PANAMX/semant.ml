@@ -181,6 +181,13 @@ let check (globals, functions) =
         then (Matrix, SMatLit(selts))
         else raise (Failure ("inconsistent matrix data type"))
 
+      | MatLitEmpty (i, j) ->
+        let (ti, ei) = expr i
+        and (tj, ej) = expr j in
+        if ti != Int then raise (Failure ("matrix height must be integer")) else
+        if tj != Int then raise (Failure ("matrix width must be integer")) else
+        (Matrix, SMatLitEmpty((ti, ei), (tj, ej)))
+
       | MatIndex(id, i, j) -> check_matrix_index id i j
 
       | MatAssign(id, i, j, e) -> let (tl, smatindex) = check_matrix_index id i j

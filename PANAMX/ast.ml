@@ -25,6 +25,7 @@ type expr =
   | ArrayIndex of string * expr
   | ArrayAssign of string * expr * expr
   | MatLit of expr list list
+  | MatLitEmpty of expr * expr
   | MatIndex of string * expr * expr
   | MatAssign of string * expr * expr * expr
 
@@ -87,6 +88,7 @@ let rec string_of_expr = function
   | ArrayIndex (s, i) -> s ^ "[" ^ (string_of_expr i) ^ "]"
   | ArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_expr i) ^ "] = " ^ (string_of_expr e)
   | MatLit _ -> "matrix"
+  | MatLitEmpty _ -> "matrix"
   | MatIndex (s, i, j) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]"
   | MatAssign (s, i, j, e) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]= " ^ (string_of_expr e)
 

@@ -72,6 +72,16 @@ let translate (globals, functions) =
   let build_matrix_empty_func : L.llvalue =
       L.declare_function "buildMatrixEmpty" build_matrix_empty_t the_module in
 
+  let matrix_access_t : L.lltype =
+      L.function_type float_t [| matrix_t; i32_t; i32_t |] in
+  let matrix_access_func : L.llvalue =
+      L.declare_function "matrixAccess" matrix_access_t the_module in
+
+  let matrix_assign_t : L.lltype =
+      L.function_type float_t [| matrix_t; i32_t; i32_t; float_t |] in
+  let matrix_assign_funct : L.llvalue =
+      L.declare_function "matrixAssign" matrix_assign_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -143,22 +153,37 @@ let translate (globals, functions) =
       | SMatLit e -> 
         let llList = List.map (List.map (expr builder)) e
         and rows = List.length e
-        and cols = List.length (List.hd e)
-        in L.build_call build_matrix_empty_func 
-          [| (L.const_int i32_t rows); (L.const_int i32_t cols) |] "init_matrix" builder
+        and cols = List.length (List.hd e) in
+        (* L.build_call build_matrix_empty_func 
+          [| L.const_int i32_t rows; L.const_int i32_t cols |] "init_matrix" builder *)
+        let matrix_ptr = (array_t (array_t float_t cols) rows) in
+        let build_matrix_t : L.lltype =
+            L.function_type matrix_t [| i32_t; i32_t; matrix_ptr |] in
+        let build_matrix_func : L.llvalue =
+            L.declare_function "buildMatrix" build_matrix_t the_module in
+        let llarray = L.const_array (array_t float_t cols) (Array.of_list 
+          (List.map (L.const_array float_t) (List.map Array.of_list llList))) in
+        (* let llptr = L.build_bitcast llarray matrix_ptr "array_pointer" builder in *)
+        L.build_call build_matrix_func 
+          [| L.const_int i32_t rows; L.const_int i32_t cols; llarray |] "init_matrix" builder
+
+      | SMatLitEmpty (i, j) ->
+        let rows = expr builder i
+        and cols = expr builder j in
+        L.build_call build_matrix_empty_func [| rows; cols |] "init_matrix" builder
 
       | SMatIndex (s, i, j) -> 
         let i' = expr builder i 
-        and j' = expr builder j in
-        let p = L.build_gep (lookup s) [| L.const_int i32_t 0; i'; j' |] "tmp" builder 
-        in L.build_load p "tmp" builder
+        and j' = expr builder j 
+        and s' = L.build_load (lookup s) s builder in
+        L.build_call matrix_access_func [| s'; i'; j' |] "matrix_access" builder
 
       | SMatAssign (s, i, j, e) -> 
         let i' = expr builder i
         and j' = expr builder j 
-        and e' = expr builder e in 
-        let p = L.build_gep (lookup s) [| L.const_int i32_t 0; i'; j' |] "tmp" builder 
-        in ignore(L.build_store e' p builder); e'
+        and e' = expr builder e 
+        and s' = L.build_load (lookup s) s builder in
+        L.build_call matrix_assign_funct [| s'; i'; j'; e' |] "matrix_assign" builder
 
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'

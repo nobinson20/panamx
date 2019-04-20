@@ -18,6 +18,7 @@ and sx =
   | SArrayIndex of string * sexpr
   | SArrayAssign of string * sexpr * sexpr
   | SMatLit of sexpr list list
+  | SMatLitEmpty of sexpr * sexpr
   | SMatIndex of string * sexpr * sexpr
   | SMatAssign of string * sexpr * sexpr * sexpr
 
@@ -60,6 +61,7 @@ let rec string_of_sexpr (t, e) =
   | SArrayLit _ -> "array"
   | SArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_sexpr i) ^ "] = " ^ (string_of_sexpr e)
   | SMatLit _ -> "matrix"
+  | SMatLitEmpty _ -> "matrix"
   | SMatIndex (s, i, j) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]"
   | SMatAssign (s, i, j, e) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]= " ^ (string_of_sexpr e)
 		) ^ ")"
