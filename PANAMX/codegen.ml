@@ -180,8 +180,8 @@ let translate (globals, functions) =
 
       | SMatAssign (s, i, j, e) -> 
         let i' = expr builder i
-        and j' = expr builder j 
-        and e' = expr builder e 
+        and j' = expr builder j
+        and e' = int_to_float builder e
         and s' = L.build_load (lookup s) s builder in
         L.build_call matrix_assign_funct [| s'; i'; j'; e' |] "matrix_assign" builder
 
@@ -216,14 +216,8 @@ let translate (globals, functions) =
           | _       -> raise (Failure "invalid operation on bool")
           ) e1' e2' "tmp" builder
       | SBinop (e1, op, e2) ->
-        let e1' = expr builder e1
-        and e2' = expr builder e2 in
-        let e11 = match fst e1 with
-            A.Int -> L.build_sitofp e1' float_t "tmp" builder 
-          | _ -> e1'
-        and e22 = match fst e2 with
-            A.Int -> L.build_sitofp e2' float_t "tmp" builder 
-          | _ -> e2' in
+        let e1' = int_to_float builder e1
+        and e2' = int_to_float builder e2 in
           (match op with
             A.Add     -> L.build_fadd
           | A.Sub     -> L.build_fsub
@@ -238,7 +232,7 @@ let translate (globals, functions) =
           | A.Geq     -> L.build_fcmp L.Fcmp.Oge
           | A.And | A.Or ->
               raise (Failure "internal error: semant should have rejected and/or on float")
-          ) e11 e22 "tmp" builder
+          ) e1' e2' "tmp" builder
       | SUnop(op, ((t, ex) as e)) ->
           let e' = expr builder e in
           (match op with
@@ -282,6 +276,12 @@ let translate (globals, functions) =
                         A.Void -> ""
                       | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list llargs) result builder
+
+    and int_to_float builder e = 
+          let e' = expr builder e in
+          match fst e with
+            A.Int -> L.build_sitofp e' float_t "tmp" builder
+          | _     -> e'
     in
 
     (* LLVM insists each basic block end with exactly one "terminator"

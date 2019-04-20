@@ -172,14 +172,18 @@ let check (globals, functions) =
 
       | MatLit elts -> 
         let rows = List.length elts in
-        if rows = 0 then raise (Failure ("empty matrix")) else
+        if rows = 0 then raise (Failure ("matrix height cannot be zero")) else
         let cols = List.length (List.hd elts) in 
-        if cols = 0 then raise (Failure ("empty matrix")) else
+        if cols = 0 then raise (Failure ("matrix width cannot be zero")) else
         let selts = List.map (List.map expr) elts
-        in let ty = fst (List.hd (List.hd selts))
+        in if List.fold_left 
+          (fun x y -> x && (List.fold_left (fun x y -> x && (fst y = Int || fst y = Float)) true y)) true selts
+        then (Matrix, SMatLit(selts))
+        else raise (Failure ("matrix can only be int/double type"))
+        (* in let ty = fst (List.hd (List.hd selts))
         in if List.fold_left (fun x y -> x && (List.fold_left (fun x y -> x && (ty = fst y)) true y)) true selts
         then (Matrix, SMatLit(selts))
-        else raise (Failure ("inconsistent matrix data type"))
+        else raise (Failure ("inconsistent matrix data type")) *)
 
       | MatLitEmpty (i, j) ->
         let (ti, ei) = expr i
@@ -190,11 +194,11 @@ let check (globals, functions) =
 
       | MatIndex(id, i, j) -> check_matrix_index id i j
 
-      | MatAssign(id, i, j, e) -> let (tl, smatindex) = check_matrix_index id i j
+      | MatAssign(id, i, j, e) -> let (_, smatindex) = check_matrix_index id i j
         and (tr, er) = expr e in
-        let ty = if tl = tr then tl else raise (Failure ("illegal assignment for matrix"))
-        in (match smatindex with
-              SMatIndex(_, (ti, ei), (tj, ej)) -> (ty, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
+        if tr != Int && tr != Float then raise (Failure ("matrix element must be int/double"))
+        else (match smatindex with
+              SMatIndex(_, (ti, ei), (tj, ej)) -> (Float, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
             | _ -> raise (Failure ("should not happen - matrix")))
 
     and check_array_index (id : string) (e : expr) = 

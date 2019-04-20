@@ -14,7 +14,7 @@ int main() {
     mat[0][2] = 3.3;
     mat[1][0] = 4.4;
     mat[1][1] = 5.5;
-    mat[1][2] = 6.6;
+    mat[1][2] = 666;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 3; j++) {
             printf(mat[i][j]);

@@ -15,3 +15,4 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 4. array for int, bool, double & array index
 5. array[3] = 12;
 6. matrix by struct
+7. cast int to double in matrix
