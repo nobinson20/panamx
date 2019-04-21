@@ -82,6 +82,11 @@ let translate (globals, functions) =
   let matrix_assign_funct : L.llvalue =
       L.declare_function "matrixAssign" matrix_assign_t the_module in
 
+  let print_matrix_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let print_matrix_func : L.llvalue =
+      L.declare_function "printMatrix" print_matrix_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -268,7 +273,9 @@ let translate (globals, functions) =
         L.build_call printf_func [| string_format_str; (expr builder e) |]
           "printf" builder
       (* | SCall ("printbig", [e]) ->
-	      L.build_call printbig_func [| (expr builder e) |] "printbig" builder *)
+        L.build_call printbig_func [| (expr builder e) |] "printbig" builder *)
+      | SCall ("printm", [e]) ->
+        L.build_call print_matrix_func [| expr builder e |] "print_matrix" builder
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
           let llargs = List.rev (List.map (expr builder) (List.rev args)) in

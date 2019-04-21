@@ -69,3 +69,20 @@ double matrixAssign(matrix m, int i, int j, double val) {
     m->mat[i][j] = val;
     return val;
 }
+
+void printMatrix(matrix m) {
+    if (m == NULL) {
+        printf("Empty Matrix\n");
+    }
+    else {
+        printf("[\n");
+        for (int i = 0; i < m->row; i++) {
+            printf("\t");
+            for (int j = 0; j < m->col; j++) {
+                printf("%.3f   ", m->mat[i][j]);
+            }
+            printf("\n");
+        }
+        printf("]\n");
+    }
+}
