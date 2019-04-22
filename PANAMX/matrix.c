@@ -71,7 +71,7 @@ double matrixAssign(matrix m, int i, int j, double val) {
 }
 
 void printMatrix(matrix m) {
-    if (m == NULL) {
+    if (m == NULL || m->mat == NULL) {
         printf("Empty Matrix\n");
     }
     else {
@@ -85,4 +85,22 @@ void printMatrix(matrix m) {
         }
         printf("]\n");
     }
+}
+/*
+void freeMatrix(matrix m) {
+    free(m);
+}
+*/
+int getHeight(matrix m) {
+    if (m == NULL || m->mat == NULL)
+        return 0;
+    else
+        return m->row;
+}
+
+int getWidth(matrix m) {
+    if (m == NULL || m->mat == NULL)
+        return 0;
+    else
+        return m->col;
 }

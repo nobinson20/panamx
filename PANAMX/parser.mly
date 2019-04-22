@@ -7,7 +7,7 @@ open Ast
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
-%token NOT EQ NEQ LT LEQ GT GEQ AND OR
+%token NOT EQ NEQ LT LEQ GT GEQ AND OR HEIGHT WIDTH
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID MATRIX
 %token <int> LITERAL
 %token <bool> BLIT
@@ -125,6 +125,8 @@ expr:
   | LT expr COMMA expr GT { MatLitEmpty($2, $4) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { MatIndex($1, $3, $6) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
+  | ID HEIGHT        { Call("matrixHeight", [Id($1)]) }
+  | ID WIDTH         { Call("matrixWidth", [Id($1)]) }
 
 arraylit:
     expr                { [$1] }

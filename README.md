@@ -16,3 +16,4 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 5. array[3] = 12;
 6. matrix by struct
 7. cast int to double in matrix
+8. get matrix height/width

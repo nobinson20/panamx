@@ -87,6 +87,21 @@ let translate (globals, functions) =
   let print_matrix_func : L.llvalue =
       L.declare_function "printMatrix" print_matrix_t the_module in
 
+  (* let free_matrix_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let free_matrix_func : L.llvalue =
+      L.declare_function "freeMatrix" free_matrix_t the_module in *)
+
+  let matrix_height_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_height_func : L.llvalue =
+      L.declare_function "getHeight" matrix_height_t the_module in
+
+  let matrix_width_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_width_func : L.llvalue =
+      L.declare_function "getWidth" matrix_width_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -276,6 +291,14 @@ let translate (globals, functions) =
         L.build_call printbig_func [| (expr builder e) |] "printbig" builder *)
       | SCall ("printm", [e]) ->
         L.build_call print_matrix_func [| expr builder e |] "print_matrix" builder
+      | SCall ("free", [e]) ->
+        (* L.build_call free_matrix_func [| expr builder e |] "free_matrix" builder *)
+        L.build_free (expr builder e) builder
+      | SCall ("matrixHeight", [e]) ->
+        L.build_call matrix_height_func [| expr builder e |] "matrix_height" builder
+      | SCall ("matrixWidth", [e]) ->
+        L.build_call matrix_width_func [| expr builder e |] "matrix_width" builder
+
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
           let llargs = List.rev (List.map (expr builder) (List.rev args)) in
