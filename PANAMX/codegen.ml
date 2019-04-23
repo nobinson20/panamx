@@ -170,27 +170,23 @@ let translate (globals, functions) =
         let p = L.build_gep (lookup id) [| L.const_int i32_t 0; idx' |] "tmp" builder 
         in ignore(L.build_store e' p builder); e'
 
-      | SMatLit e -> 
-        let llList = List.map (List.map (expr builder)) e
-        and rows = List.length e
-        and cols = List.length (List.hd e) in
-        (* L.build_call build_matrix_empty_func 
-          [| L.const_int i32_t rows; L.const_int i32_t cols |] "init_matrix" builder *)
-        let matrix_ptr = (array_t (array_t float_t cols) rows) in
+      | SMatLit (rows, cols, e) -> 
+        let matrix_ptr = array_t float_t (rows * cols) in
         let build_matrix_t : L.lltype =
             L.function_type matrix_t [| i32_t; i32_t; matrix_ptr |] in
         let build_matrix_func : L.llvalue =
             L.declare_function "buildMatrix" build_matrix_t the_module in
-        let llarray = L.const_array (array_t float_t cols) (Array.of_list 
-          (List.map (L.const_array float_t) (List.map Array.of_list llList))) in
-        (* let llptr = L.build_bitcast llarray matrix_ptr "array_pointer" builder in *)
+        (* let llarray = L.const_array (array_t float_t cols) (Array.of_list 
+          (List.map (L.const_array float_t) (List.map Array.of_list llList))) in *)
+        let llarray = L.const_array float_t (Array.of_list (List.map (expr builder) e)) in
+        let llptr = L.const_gep llarray [| L.const_int i32_t 0 |] in
         L.build_call build_matrix_func 
-          [| L.const_int i32_t rows; L.const_int i32_t cols; llarray |] "init_matrix" builder
+          [| L.const_int i32_t rows; L.const_int i32_t cols; llptr |] "init_matrix" builder
 
       | SMatLitEmpty (i, j) ->
         let rows = expr builder i
         and cols = expr builder j in
-        L.build_call build_matrix_empty_func [| rows; cols |] "init_matrix" builder
+        L.build_call build_matrix_empty_func [| rows; cols |] "init_matrix_empty" builder
 
       | SMatIndex (s, i, j) -> 
         let i' = expr builder i 

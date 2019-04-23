@@ -17,7 +17,7 @@ and sx =
   | SArrayLit of sexpr list
   | SArrayIndex of string * sexpr
   | SArrayAssign of string * sexpr * sexpr
-  | SMatLit of sexpr list list
+  | SMatLit of int * int * sexpr list
   | SMatLitEmpty of sexpr * sexpr
   | SMatIndex of string * sexpr * sexpr
   | SMatAssign of string * sexpr * sexpr * sexpr

@@ -179,11 +179,15 @@ let check (globals, functions) =
         if rows = 0 then raise (Failure ("matrix height cannot be zero")) else
         let cols = List.length (List.hd elts) in 
         if cols = 0 then raise (Failure ("matrix width cannot be zero")) else
-        let selts = List.map (List.map expr) elts
+        let selts = List.map expr (List.fold_left (fun x y -> x @ y) [] elts) in
+        if List.fold_left (fun x y -> x && (fst y = Int || fst y = Float)) true selts
+        then (Matrix, SMatLit(rows, cols, selts))
+        else raise (Failure ("matrix elements can only be int/double type"))
+        (* let selts = List.map (List.map expr) elts
         in if List.fold_left 
           (fun x y -> x && (List.fold_left (fun x y -> x && (fst y = Int || fst y = Float)) true y)) true selts
         then (Matrix, SMatLit(selts))
-        else raise (Failure ("matrix can only be int/double type"))
+        else raise (Failure ("matrix can only be int/double type")) *)
         (* in let ty = fst (List.hd (List.hd selts))
         in if List.fold_left (fun x y -> x && (List.fold_left (fun x y -> x && (ty = fst y)) true y)) true selts
         then (Matrix, SMatLit(selts))
