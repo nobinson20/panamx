@@ -175,8 +175,8 @@ let translate (globals, functions) =
             L.function_type matrix_t [| i32_t; i32_t; pointer_t float_t |] in
         let build_matrix_func : L.llvalue =
             L.declare_function "buildMatrix" build_matrix_t the_module in
+        let llarray = L.const_array float_t (Array.of_list (List.map (int_to_float builder) e)) in
         let array_ptr_ty = array_t float_t (rows * cols) in
-        let llarray = L.const_array float_t (Array.of_list (List.map (expr builder) e)) in
         let llptr = L.build_alloca array_ptr_ty "matrix_array" builder in
         ignore(L.build_store llarray llptr builder); 
         let ptr = L.build_gep llptr [| L.const_int i32_t 0; L.const_int i32_t 0 |] "get_array_ptr" builder in
