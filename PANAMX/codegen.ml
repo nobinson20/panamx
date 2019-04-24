@@ -171,17 +171,17 @@ let translate (globals, functions) =
         in ignore(L.build_store e' p builder); e'
 
       | SMatLit (rows, cols, e) -> 
-        let matrix_ptr = array_t float_t (rows * cols) in
         let build_matrix_t : L.lltype =
-            L.function_type matrix_t [| i32_t; i32_t; matrix_ptr |] in
+            L.function_type matrix_t [| i32_t; i32_t; pointer_t float_t |] in
         let build_matrix_func : L.llvalue =
             L.declare_function "buildMatrix" build_matrix_t the_module in
-        (* let llarray = L.const_array (array_t float_t cols) (Array.of_list 
-          (List.map (L.const_array float_t) (List.map Array.of_list llList))) in *)
+        let array_ptr_ty = array_t float_t (rows * cols) in
         let llarray = L.const_array float_t (Array.of_list (List.map (expr builder) e)) in
-        let llptr = L.const_gep llarray [| L.const_int i32_t 0 |] in
+        let llptr = L.build_alloca array_ptr_ty "matrix_array" builder in
+        ignore(L.build_store llarray llptr builder); 
+        let ptr = L.build_gep llptr [| L.const_int i32_t 0; L.const_int i32_t 0 |] "get_array_ptr" builder in
         L.build_call build_matrix_func 
-          [| L.const_int i32_t rows; L.const_int i32_t cols; llptr |] "init_matrix" builder
+          [| L.const_int i32_t rows; L.const_int i32_t cols; ptr |] "init_matrix" builder
 
       | SMatLitEmpty (i, j) ->
         let rows = expr builder i
