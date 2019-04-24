@@ -17,32 +17,7 @@ matrix initMatrix(int row, int col) {
     }
     return m;
 }
-/*
-matrix buildMatrix(int row, int col, double arr[][col]) {
-    // char str[20];
-    // sprintf(str, "%d %d\n", row, col);
-    // perror(str);
-    matrix m = initMatrix(row, col);
-    // char str[20];
-    // sprintf(str, "%f\n", m->mat[0][0]);
-    // perror(str);
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < col; j++) {
-            // char str[20];
-            // sprintf(str, "%d %d %f\n", i, j, arr[i][j]);
-            // perror(str);
-            m->mat[i][j] = arr[i][j];
-            // char str[20];
-            // sprintf(str, "%d %d %f\n", i, j, arr[i][j]);
-            // perror(str);
-        }
-    }
-    // char str[20];
-    // sprintf(str, "%f\n", m->mat[0][0]);
-    // perror(str);
-    return m;
-}
-*/
+
 matrix buildMatrix(int row, int col, double *arr) {
     matrix m = initMatrix(row, col);
     for (int i = 0; i < row; i++) {
