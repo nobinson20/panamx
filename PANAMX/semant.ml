@@ -151,29 +151,6 @@ let check (globals, functions) =
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
 
-      | ArrayLit elements ->
-        let len = List.length elements in
-        if len = 0 then raise (Failure ("empty array"))
-        else let selem = List.map expr elements in 
-          let ty = fst (List.hd selem) in 
-            if List.fold_left (fun x y -> x && (ty = fst y)) true selem
-            then let tyy = match ty with
-                Int   -> Arrays(Int, len)
-              | Bool  -> Arrays(Bool, len)
-              | Float -> Arrays(Float, len)
-              | _     -> raise (Failure ("invalid array type"))
-              in (tyy, SArrayLit(selem))
-            else raise (Failure ("inconsistent array data type"))
-
-      | ArrayIndex(id, e) -> check_array_index id e 
-
-      | ArrayAssign(id, idx, e) -> let (tl, sarrayindex) = check_array_index id idx
-        and (tr, er) = expr e in 
-        let ty = if tl = tr then tl else raise (Failure ("illegal assignment for array"))
-        in (match sarrayindex with
-            SArrayIndex(_, (tt, ee)) -> (ty, SArrayAssign(id, (tt, ee), (tr, er)))
-          | _ -> raise (Failure ("should not happen - array")))
-
       | MatLit elts -> 
         let rows = List.length elts in
         if rows = 0 then raise (Failure ("matrix height cannot be zero")) else
@@ -208,14 +185,6 @@ let check (globals, functions) =
         else (match smatindex with
               SMatIndex(_, (ti, ei), (tj, ej)) -> (Float, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
             | _ -> raise (Failure ("should not happen - matrix")))
-
-    and check_array_index (id : string) (e : expr) = 
-        let (tt, e') = expr e in
-        if tt != Int then raise (Failure ("index must be integer"))
-        else let ty = match (type_of_identifier id) with
-                Arrays(tyy, _) -> tyy
-              | _ -> raise (Failure ("index can only be used on array/matrix"))
-        in (ty, SArrayIndex(id, (tt, e')))
 
     and check_matrix_index (id : string) (i : expr) (j : expr) = 
         let (ti, ei) = expr i 

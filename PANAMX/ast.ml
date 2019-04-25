@@ -5,8 +5,7 @@ type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Ge
 
 type uop = Neg | Not | Inc | Dec
 
-type typ = Int | Bool | String | Float | Void | 
-           Arrays of typ * int | Matrix
+type typ = Int | Bool | String | Float | Void | Matrix
 
 type bind = typ * string
 
@@ -21,9 +20,6 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | Noexpr
-  | ArrayLit of expr list
-  | ArrayIndex of string * expr
-  | ArrayAssign of string * expr * expr
   | MatLit of expr list list
   | MatLitEmpty of expr * expr
   | MatIndex of string * expr * expr
@@ -84,9 +80,6 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
-  | ArrayLit _ -> "array"
-  | ArrayIndex (s, i) -> s ^ "[" ^ (string_of_expr i) ^ "]"
-  | ArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_expr i) ^ "] = " ^ (string_of_expr e)
   | MatLit _ -> "matrix"
   | MatLitEmpty _ -> "matrix"
   | MatIndex (s, i, j) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]"
@@ -111,12 +104,6 @@ let string_of_typ = function
   | String -> "string"
   | Float -> "float"
   | Void -> "void"
-  | Arrays (ty, _) -> 
-    (match ty with
-      Int   -> "int[]"
-    | Bool  -> "bool[]"
-    | Float -> "double[]"
-    | _     -> "")
   | Matrix -> "matrix"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"

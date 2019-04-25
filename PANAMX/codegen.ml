@@ -38,13 +38,12 @@ let translate (globals, functions) =
   in
 
   (* Return the LLVM type for a MicroC type *)
-  let rec ltype_of_typ = function
+  let ltype_of_typ = function
       A.Int    -> i32_t
     | A.Bool   -> i1_t
     | A.String -> pointer_t i8_t
     | A.Float  -> float_t
     | A.Void   -> void_t
-    | A.Arrays(ty, len) -> array_t (ltype_of_typ ty) len
     | A.Matrix -> matrix_t
   in
 
@@ -150,25 +149,13 @@ let translate (globals, functions) =
     in
 
     (* Construct code for an expression; return its value *)
-    let rec expr builder ((ty, e) : sexpr) = match e with
+    let rec expr builder ((_, e) : sexpr) = match e with
 	      SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SStrLit s   -> L.build_global_stringptr s "tmp" builder
       | SFliteral l -> L.const_float_of_string float_t l
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
-
-      | SArrayLit e -> L.const_array (ltype_of_typ ty) (Array.of_list (List.map (expr builder) e))
-
-      | SArrayIndex (id, e) -> let idx = expr builder e in 
-        let p = L.build_gep (lookup id) [| L.const_int i32_t 0; idx |] "tmp" builder 
-        in L.build_load p "tmp" builder
-
-      | SArrayAssign (id, idx, e) -> 
-        let idx' = expr builder idx 
-        and e' = expr builder e in
-        let p = L.build_gep (lookup id) [| L.const_int i32_t 0; idx' |] "tmp" builder 
-        in ignore(L.build_store e' p builder); e'
 
       | SMatLit (rows, cols, e) -> 
         let build_matrix_t : L.lltype =

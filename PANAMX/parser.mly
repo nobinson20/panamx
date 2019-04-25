@@ -56,16 +56,12 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
-    primitive_type { $1 }
+    INT       { Int   }
+  | BOOL      { Bool  }
+  | FLOAT     { Float }
   | STRING    { String }
   | VOID      { Void }
-  | primitive_type LBRACKET LITERAL RBRACKET { Arrays($1, $3) }
   | MATRIX    { Matrix }
-
-primitive_type:
-    INT   { Int   }
-  | BOOL  { Bool  }
-  | FLOAT { Float }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -118,23 +114,20 @@ expr:
   | expr DECREMENT   { Unop(Dec, $1)          }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
-  | LBRACKET arraylit RBRACKET { ArrayLit($2) }
-  | ID LBRACKET expr RBRACKET { ArrayIndex($1, $3) }
-  | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayAssign($1, $3, $6) }
-  | LBRACKET matrixlit RBRACKET { MatLit($2) }
+  | LBRACKET matrixlit RBRACKET  { MatLit($2) }
   | LT expr COMMA expr GT { MatLitEmpty($2, $4) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { MatIndex($1, $3, $6) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
   | ID HEIGHT        { Call("matrixHeight", [Id($1)]) }
   | ID WIDTH         { Call("matrixWidth", [Id($1)]) }
 
+matrixlit:
+    arraylit                { [$1] }
+  | arraylit SEMI matrixlit { $1 :: $3 }
+
 arraylit:
     expr                { [$1] }
   | expr COMMA arraylit { $1 :: $3 }
-
-matrixlit:
-    /* nothing */           { [] }
-  | arraylit SEMI matrixlit { $1 :: $3 }
 
 args_opt:
     /* nothing */ { [] }

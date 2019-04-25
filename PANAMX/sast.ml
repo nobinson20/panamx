@@ -14,9 +14,6 @@ and sx =
   | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
-  | SArrayLit of sexpr list
-  | SArrayIndex of string * sexpr
-  | SArrayAssign of string * sexpr * sexpr
   | SMatLit of int * int * sexpr list
   | SMatLitEmpty of sexpr * sexpr
   | SMatIndex of string * sexpr * sexpr
@@ -57,9 +54,6 @@ let rec string_of_sexpr (t, e) =
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
-  | SArrayIndex (s, i) -> s ^ "[" ^ (string_of_sexpr i) ^ "]"
-  | SArrayLit _ -> "array"
-  | SArrayAssign (s, i, e) -> s ^ "[" ^ (string_of_sexpr i) ^ "] = " ^ (string_of_sexpr e)
   | SMatLit _ -> "matrix"
   | SMatLitEmpty _ -> "matrix"
   | SMatIndex (s, i, j) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]"
