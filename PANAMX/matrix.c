@@ -89,3 +89,83 @@ int getWidth(matrix m) {
     else
         return m->col;
 }
+
+// returns the sum of all values in the matrix m; for now, only works for
+// double type
+double sum(matrix m) {
+    // total starts at zero; handles error cases
+    double s = 0;
+    if(m == NULL || m->mat == NULL) {
+         printf("Empty Matrix\n");
+    }
+    else {
+	// iterate through all entries
+        for (int i = 0; i < m->row; i++) {
+            for (int j = 0; j < m->col; j++) {
+		// add each entry to running total
+                s = s + m->mat[i][j];
+              }
+ 	 }
+    }
+    return s;
+}
+
+// returns the average of all entries in a matrix m; for now, only works for 
+// double type
+double mean(matrix m) {
+    double avg = 0;
+    double tot = 0;
+    if(m == NULL || m->mat == NULL) {
+        printf("Empty Matrix\n");
+    }
+    else {
+        // iterate through all entries
+	for (int i = 0; i < m->row; i++) {
+            for (int j = 0; j < m->col; j++) {
+		// avg keeps track of the sum; tot keeps track of the size
+	        tot++;
+	        avg = avg + m->mat[i][j];
+	    } 
+	}
+    }
+    // average = total / size
+    double avg = avg / tot;
+    return avg;
+}
+
+matrix trans(matrix m) {
+    // if the matrix m does not exist, return NULL
+    if(m == NULL || m->mat == NULL) {
+        printf("Empty Matrix\n");
+	return NULL;
+    }
+    // all other cases, transpose by swapping elements accordingly
+    else {
+	// create new matrix with all entries initialized to zero
+        matrix new = buildMatrixEmpty(m->col, m->row);
+	// iterate through all entries to initialize correct values
+        for (int i = 0; i < new->row; i++) {
+            for (int j = 0; j < new->col; j++) {
+                // transpose each value
+                new->mat[i][j] = m->mat[j][i];
+            }
+        }
+	return new;
+    }    
+}
+
+double* eig(matrix m) {
+
+}
+
+double det(matrix m) {
+
+}
+
+double rank(matrix m) {
+
+}
+
+matrix rref(matrix m) {
+
+}
