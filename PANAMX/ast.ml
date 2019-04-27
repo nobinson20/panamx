@@ -5,7 +5,7 @@ type op = Add | Sub | Mult | Div | Mod | Equal | Neq | Less | Leq | Greater | Ge
 
 type uop = Neg | Not | Inc | Dec
 
-type typ = Int | Bool | String | Float | Void | Matrix
+type typ = Int | Bool | String | Float | Void | Matrix | Struct of string
 
 type bind = typ * string
 
@@ -41,7 +41,12 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = bind list * func_decl list
+type struct_decl = {
+  sname : string;
+  svar  : bind list;
+}
+
+type program = bind list * func_decl list * struct_decl list
 
 (* Pretty-printing functions *)
 
@@ -105,6 +110,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | Matrix -> "matrix"
+  | Struct e -> "struct " ^ e
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
@@ -116,6 +122,6 @@ let string_of_fdecl fdecl =
   String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_program (vars, funcs) =
+let string_of_program (vars, funcs, _) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)

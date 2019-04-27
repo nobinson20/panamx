@@ -47,6 +47,7 @@ rule token = parse
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | "matrix" { MATRIX }
+| "struct" { STRUCT }
 | ".height" { HEIGHT }
 | ".width"  { WIDTH }
 | digits as lxm { LITERAL(int_of_string lxm) }

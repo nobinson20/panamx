@@ -7,7 +7,7 @@ open Ast
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
-%token NOT EQ NEQ LT LEQ GT GEQ AND OR HEIGHT WIDTH
+%token NOT EQ NEQ LT LEQ GT GEQ AND OR HEIGHT WIDTH STRUCT
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID MATRIX
 %token <int> LITERAL
 %token <bool> BLIT
@@ -35,9 +35,10 @@ program:
   decls EOF { $1 }
 
 decls:
-   /* nothing */ { ([], [])               }
- | decls vdecl { (($2 :: fst $1), snd $1) }
- | decls fdecl { (fst $1, ($2 :: snd $1)) }
+   /* nothing */ { ([], [], [])                          }
+ | decls vdecl { let (a, b, c) = $1 in (($2 :: a), b, c) }
+ | decls fdecl { let (a, b, c) = $1 in (a, ($2 :: b), c) }
+ | decls sdecl { let (a, b, c) = $1 in (a, b, ($2 :: c)) }
 
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
@@ -62,6 +63,16 @@ typ:
   | STRING    { String }
   | VOID      { Void }
   | MATRIX    { Matrix }
+  | STRUCT ID { Struct($2) }
+
+sdecl:
+    STRUCT ID LBRACE sbody_list RBRACE SEMI { {
+      sname = $2; 
+      svar = $4 } }
+
+sbody_list:
+    vdecl            { [$1] }
+  | vdecl sbody_list { $1 :: $2 }
 
 vdecl_list:
     /* nothing */    { [] }
