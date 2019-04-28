@@ -158,6 +158,15 @@ let translate (globals, functions, structs) =
       List.fold_left add_local formals fdecl.slocals
     in
 
+    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+                  StringMap.empty (fdecl.sformals @ fdecl.slocals)
+    in
+
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
     let lookup n = try StringMap.find n local_vars
@@ -207,6 +216,21 @@ let translate (globals, functions, structs) =
       | SStructLit id -> 
         let (sty, _) = StringMap.find id struct_decls
         in L.build_malloc sty (id ^ "_body") builder
+
+      | SMember (s, e) -> 
+        let sname = match (type_of_identifier s) with
+                A.Struct n -> n
+              | _ -> raise (Failure ("Invalid access(.) operation for " ^ s)) in
+        let (_, sdecl) = StringMap.find sname struct_decls in
+        let idx = 
+          let rec find_idx = function
+              [] -> raise (Failure ("Struct " ^ sname ^ " does not have member " ^ e))
+            | (_, var) :: _ when var = e -> 0
+            | _ :: tl -> 1 + find_idx tl
+          in find_idx sdecl.ssvar in
+        let struct_p = L.build_load (lookup s) s builder in
+        let member_p = L.build_struct_gep struct_p idx (sname ^ e) builder in
+        L.build_load member_p (s ^ e) builder
 
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'

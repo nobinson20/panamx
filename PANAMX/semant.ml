@@ -95,6 +95,22 @@ let check (globals, functions, structs) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    let find_struct (id : string) = (
+        let rec find_svar = function
+            [] -> raise (Failure ("Cannot find struct " ^ id))
+          | sdecl :: _ when sdecl.sname = id -> sdecl.svar
+          | _ :: tl -> find_svar tl
+        in find_svar structs)
+    in
+
+    let get_smember_type (s : string) (e : string) = (
+        let rec get_member_type = function
+            [] -> raise (Failure ("Struct " ^ s ^ " does not have member " ^ e))
+          | (ty, name) :: _ when name = e -> ty
+          | _ :: tl -> get_member_type tl
+        in get_member_type (find_struct s))
+    in
+
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec expr = function
         Literal  l -> (Int, SLiteral l)
@@ -177,13 +193,20 @@ let check (globals, functions, structs) =
               SMatIndex(_, (ti, ei), (tj, ej)) -> (Float, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
             | _ -> raise (Failure ("should not happen - matrix")))
 
-      | StructLit id -> (Struct(id), SStructLit(id))
+      | StructLit id -> ignore(find_struct id); (Struct(id), SStructLit(id))
+
+      | Member (s, e) -> 
+        let n = match (type_of_identifier s) with
+            Struct m -> m
+          | _ -> raise (Failure ("Invalid access(.) operation for " ^ s))
+        in let ty = get_smember_type n e in (ty, SMember(s, e))
 
     and check_matrix_index (id : string) (i : expr) (j : expr) = 
         let (ti, ei) = expr i 
         and (tj, ej) = expr j in
         if ti != Int || tj != Int then raise (Failure ("index must be integer"))
         else (Float, SMatIndex(id, (ti, ei), (tj, ej)))
+
     in
 
     let check_bool_expr e =

@@ -6,6 +6,7 @@ struct Node {
 int main() {
     struct Node p;
     p = <struct Node>;
-    prints("Nice");
+    print(p.x);
+    //print(p.y);
     return 0;
 }

@@ -25,6 +25,7 @@ type expr =
   | MatIndex of string * expr * expr
   | MatAssign of string * expr * expr * expr
   | StructLit of string
+  | Member of string * string
 
 type stmt =
     Block of stmt list
@@ -91,6 +92,7 @@ let rec string_of_expr = function
   | MatIndex (s, i, j) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]"
   | MatAssign (s, i, j, e) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]= " ^ (string_of_expr e)
   | StructLit e -> "new struct " ^ e ^ " ()"
+  | Member (s, e) -> s ^ "." ^ e
 
 let rec string_of_stmt = function
     Block(stmts) ->
