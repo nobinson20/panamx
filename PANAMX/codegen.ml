@@ -98,10 +98,10 @@ let translate (globals, functions, structs) =
   let print_matrix_func : L.llvalue =
       L.declare_function "printMatrix" print_matrix_t the_module in
 
-  (* let free_matrix_t : L.lltype =
+  let free_matrix_t : L.lltype =
       L.function_type i32_t [| matrix_t |] in
   let free_matrix_func : L.llvalue =
-      L.declare_function "freeMatrix" free_matrix_t the_module in *)
+      L.declare_function "freeMatrix" free_matrix_t the_module in
 
   let matrix_height_t : L.lltype =
       L.function_type i32_t [| matrix_t |] in
@@ -293,8 +293,8 @@ let translate (globals, functions, structs) =
       | SCall ("printm", [e]) ->
         L.build_call print_matrix_func [| expr builder e |] "print_matrix" builder
       | SCall ("free", [e]) ->
-        (* L.build_call free_matrix_func [| expr builder e |] "free_matrix" builder *)
-        L.build_free (expr builder e) builder
+        L.build_call free_matrix_func [| expr builder e |] "free_matrix" builder
+        (* L.build_free (expr builder e) builder *)
       | SCall ("matrixHeight", [e]) ->
         L.build_call matrix_height_func [| expr builder e |] "matrix_height" builder
       | SCall ("matrixWidth", [e]) ->

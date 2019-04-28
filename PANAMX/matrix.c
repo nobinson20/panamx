@@ -71,11 +71,11 @@ void printMatrix(matrix m) {
         printf("]\n");
     }
 }
-/*
+
 void freeMatrix(matrix m) {
     free(m);
 }
-*/
+
 int getHeight(matrix m) {
     if (m == NULL || m->mat == NULL)
         return 0;
@@ -96,16 +96,17 @@ double sum(matrix m) {
     // total starts at zero; handles error cases
     double s = 0;
     if(m == NULL || m->mat == NULL) {
-         printf("Empty Matrix\n");
+        perror("Empty Matrix");
+        exit(1);
     }
     else {
 	// iterate through all entries
         for (int i = 0; i < m->row; i++) {
             for (int j = 0; j < m->col; j++) {
-		// add each entry to running total
+		        // add each entry to running total
                 s = s + m->mat[i][j];
               }
- 	 }
+ 	    }
     }
     return s;
 }
@@ -116,20 +117,21 @@ double mean(matrix m) {
     double avg = 0;
     double tot = 0;
     if(m == NULL || m->mat == NULL) {
-        printf("Empty Matrix\n");
+        perror("Empty Matrix");
+        exit(1);
     }
     else {
         // iterate through all entries
 	for (int i = 0; i < m->row; i++) {
             for (int j = 0; j < m->col; j++) {
 		// avg keeps track of the sum; tot keeps track of the size
-	        tot++;
-	        avg = avg + m->mat[i][j];
-	    } 
-	}
+                tot++;
+                avg = avg + m->mat[i][j];
+	        }
+	    }
     }
     // average = total / size
-    double avg = avg / tot;
+    avg = avg / tot;
     return avg;
 }
 
@@ -155,17 +157,17 @@ matrix trans(matrix m) {
 }
 
 double* eig(matrix m) {
-
+    return NULL;
 }
 
 double det(matrix m) {
-
+    return 0;
 }
 
 double rank(matrix m) {
-
+    return 0;
 }
 
 matrix rref(matrix m) {
-
+    return NULL;
 }

@@ -1,4 +1,7 @@
-# coms-4115
+# Suggestion
+Create a new branch when pushing to github
+
+# COMS-4115
 Project files for PANAMX, a matrix manipulation language developed for COMS 4115 Programming Languages and Translators at Columbia University
 
 **How to run single test file**
@@ -15,3 +18,4 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 4. matrix by struct
 5. cast int to double in matrix
 6. get matrix height/width
+7. struct define & declaration
