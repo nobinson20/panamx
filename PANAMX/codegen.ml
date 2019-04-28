@@ -217,20 +217,13 @@ let translate (globals, functions, structs) =
         let (sty, _) = StringMap.find id struct_decls
         in L.build_malloc sty (id ^ "_body") builder
 
-      | SMember (s, e) -> 
-        let sname = match (type_of_identifier s) with
-                A.Struct n -> n
-              | _ -> raise (Failure ("Invalid access(.) operation for " ^ s)) in
-        let (_, sdecl) = StringMap.find sname struct_decls in
-        let idx = 
-          let rec find_idx = function
-              [] -> raise (Failure ("Struct " ^ sname ^ " does not have member " ^ e))
-            | (_, var) :: _ when var = e -> 0
-            | _ :: tl -> 1 + find_idx tl
-          in find_idx sdecl.ssvar in
-        let struct_p = L.build_load (lookup s) s builder in
-        let member_p = L.build_struct_gep struct_p idx (sname ^ e) builder in
-        L.build_load member_p (s ^ e) builder
+      | SMember (s, m) -> let mem_p = get_smem_ptr builder s m in
+        L.build_load mem_p (s ^ m) builder
+
+      | SMemAssign (s, m, e) -> 
+        let e' = expr builder e in
+        let mem_p = get_smem_ptr builder s m in
+        ignore(L.build_store e' mem_p builder); e'
 
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
@@ -339,6 +332,22 @@ let translate (globals, functions, structs) =
           match fst e with
             A.Int -> L.build_sitofp e' float_t "tmp" builder
           | _     -> e'
+
+    (* get the member m's pointer in struct *)
+    and get_smem_ptr builder s m = 
+          let sname = match (type_of_identifier s) with
+                A.Struct n -> n
+              | _ -> raise (Failure ("Invalid access(.) operation for " ^ s)) in
+          let (_, sdecl) = StringMap.find sname struct_decls in
+          let idx = 
+            let rec find_idx = function
+                [] -> raise (Failure ("Struct " ^ sname ^ " does not have member " ^ m))
+              | (_, var) :: _ when var = m -> 0
+              | _ :: tl -> 1 + find_idx tl
+            in find_idx sdecl.ssvar in
+          let struct_p = L.build_load (lookup s) s builder in
+          L.build_struct_gep struct_p idx (sname ^ m) builder
+
     in
 
     (* LLVM insists each basic block end with exactly one "terminator"

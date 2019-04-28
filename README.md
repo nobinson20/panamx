@@ -19,3 +19,4 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 5. cast int to double in matrix
 6. get matrix height/width
 7. struct define & declaration & initialization
+8. struct member access & assign (only for int / double / bool, not for pointer & matrix)

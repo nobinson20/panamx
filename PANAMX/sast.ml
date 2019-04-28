@@ -20,6 +20,7 @@ and sx =
   | SMatAssign of string * sexpr * sexpr * sexpr
   | SStructLit of string
   | SMember of string * string
+  | SMemAssign of string * string * sexpr
 
 type sstmt =
     SBlock of sstmt list
@@ -67,6 +68,7 @@ let rec string_of_sexpr (t, e) =
   | SMatAssign (s, i, j, e) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]= " ^ (string_of_sexpr e)
   | SStructLit e -> "new struct " ^ e ^ " ()"
   | SMember (s, e) -> s ^ "." ^ e
+  | SMemAssign (s, m, e) -> s ^ "." ^ m ^ " = " ^ (string_of_sexpr e)
 		) ^ ")"
 
 let rec string_of_sstmt = function

@@ -133,6 +133,7 @@ expr:
   | ID WIDTH         { Call("matrixWidth", [Id($1)]) }
   | LT STRUCT ID GT  { StructLit($3)          }
   | ID DOT ID        { Member($1, $3)         }
+  | ID DOT ID ASSIGN expr { MemAssign($1, $3, $5) }
 
 matrixlit:
     arraylit                { [$1] }

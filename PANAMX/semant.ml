@@ -95,6 +95,11 @@ let check (globals, functions, structs) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    let get_struct_name (s : string) = match (type_of_identifier s) with
+                              Struct n -> n
+                            | _ -> raise (Failure ("Invalid access(.) operation for " ^ s))
+    in
+
     let find_struct (id : string) = (
         let rec find_svar = function
             [] -> raise (Failure ("Cannot find struct " ^ id))
@@ -195,11 +200,17 @@ let check (globals, functions, structs) =
 
       | StructLit id -> ignore(find_struct id); (Struct(id), SStructLit(id))
 
-      | Member (s, e) -> 
-        let n = match (type_of_identifier s) with
-            Struct m -> m
-          | _ -> raise (Failure ("Invalid access(.) operation for " ^ s))
-        in let ty = get_smember_type n e in (ty, SMember(s, e))
+      | Member (s, m) -> 
+        let n = get_struct_name s in
+        let ty = get_smember_type n m in (ty, SMember(s, m))
+
+      | MemAssign (s, m, e) as ex -> 
+        let n = get_struct_name s in
+        let lt = get_smember_type n m in
+        let (rt, e') = expr e in
+        let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
+            string_of_typ rt ^ " in " ^ string_of_expr ex
+        in (check_assign lt rt err, SMemAssign(s, m, (rt, e')))
 
     and check_matrix_index (id : string) (i : expr) (j : expr) = 
         let (ti, ei) = expr i 
