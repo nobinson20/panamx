@@ -35,7 +35,12 @@ type sfunc_decl = {
     sbody : sstmt list;
   }
 
-type sprogram = bind list * sfunc_decl list
+type sstruct_decl = {
+  ssname : string;
+  ssvar : bind list;
+}
+
+type sprogram = bind list * sfunc_decl list * sstruct_decl list
 
 (* Pretty-printing functions *)
 
@@ -82,6 +87,6 @@ let string_of_sfdecl fdecl =
   String.concat "" (List.map string_of_sstmt fdecl.sbody) ^
   "}\n"
 
-let string_of_sprogram (vars, funcs) =
+let string_of_sprogram (vars, funcs, _) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_sfdecl funcs)

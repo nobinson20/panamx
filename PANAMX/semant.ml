@@ -10,7 +10,7 @@ module StringMap = Map.Make(String)
 
   Check each global variable, then check each function *)
 
-let check (globals, functions) =
+let check (globals, functions, structs) =
 
   (* Verify a list of bindings has no void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
@@ -160,15 +160,6 @@ let check (globals, functions) =
         if List.fold_left (fun x y -> x && (fst y = Int || fst y = Float)) true selts
         then (Matrix, SMatLit(rows, cols, selts))
         else raise (Failure ("matrix elements can only be int/double type"))
-        (* let selts = List.map (List.map expr) elts
-        in if List.fold_left 
-          (fun x y -> x && (List.fold_left (fun x y -> x && (fst y = Int || fst y = Float)) true y)) true selts
-        then (Matrix, SMatLit(selts))
-        else raise (Failure ("matrix can only be int/double type")) *)
-        (* in let ty = fst (List.hd (List.hd selts))
-        in if List.fold_left (fun x y -> x && (List.fold_left (fun x y -> x && (ty = fst y)) true y)) true selts
-        then (Matrix, SMatLit(selts))
-        else raise (Failure ("inconsistent matrix data type")) *)
 
       | MatLitEmpty (i, j) ->
         let (ti, ei) = expr i
@@ -231,4 +222,28 @@ let check (globals, functions) =
 	      SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
     }
-  in (globals, List.map check_function functions)
+  in
+
+  (**** Check structs ****)
+  let check_structs (st_list : struct_decl list) = 
+    (* check struct name *)
+    let rec struct_dups = function
+        [] -> ()
+      | (s1 :: s2 :: _) when s1.sname = s2.sname -> 
+        raise (Failure ("duplicate struct name " ^ s1.sname))
+      | _ :: tl -> struct_dups tl
+    in struct_dups st_list;
+
+    (* check struct body *)
+    let struct_binds (st : struct_decl) = 
+      if List.length st.svar = 0 then raise (Failure ("Empty struct body"))
+      else check_binds "struct" st.svar
+    in List.iter struct_binds st_list;
+
+    let check_struct (st : struct_decl) = {
+      ssname = st.sname;
+      ssvar = st.svar;
+    }
+    in List.map check_struct st_list
+
+  in (globals, List.map check_function functions, check_structs structs)

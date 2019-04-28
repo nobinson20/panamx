@@ -19,7 +19,7 @@ open Sast
 module StringMap = Map.Make(String)
 
 (* translate : Sast.program -> Llvm.module *)
-let translate (globals, functions) =
+let translate (globals, functions, structs) =
   let context    = L.global_context () in
 
   (* Create the LLVM compilation module into which
@@ -45,6 +45,7 @@ let translate (globals, functions) =
     | A.Float  -> float_t
     | A.Void   -> void_t
     | A.Matrix -> matrix_t
+    | A.Struct e -> pointer_t (L.named_struct_type context e)
   in
 
   (* Create a map of global variables after creating each *)
@@ -55,6 +56,17 @@ let translate (globals, functions) =
         | _ -> L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
+
+  let struct_decls : (L.lltype * sstruct_decl) StringMap.t =
+    let define_struct m sdecl = 
+      let get_sbody_ty ((ty, _) : A.bind) = ltype_of_typ ty in
+      let sname = sdecl.ssname
+      and svar_type = Array.of_list (List.map get_sbody_ty sdecl.ssvar) in
+      let stype = L.named_struct_type context sname in
+      L.struct_set_body stype svar_type false;
+      StringMap.add sname (stype, sdecl) m in
+    List.fold_left define_struct StringMap.empty structs
+  in
 
   let printf_t : L.lltype =
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -133,7 +145,13 @@ let translate (globals, functions) =
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
       and add_local m (t, n) =
-      let local_var = L.build_alloca (ltype_of_typ t) n builder
+      let local_var = match t with
+          A.Struct e -> 
+            let (sty, _) = StringMap.find e struct_decls in
+            let ptr = L.build_alloca (pointer_t sty) n builder in
+            let sbody = L.build_malloc sty (n ^ "_body") builder in
+            ignore(L.build_store sbody ptr builder); ptr
+        | _ -> L.build_alloca (ltype_of_typ t) n builder
       in StringMap.add n local_var m
       in
 
