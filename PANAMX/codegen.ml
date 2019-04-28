@@ -147,10 +147,8 @@ let translate (globals, functions, structs) =
       and add_local m (t, n) =
       let local_var = match t with
           A.Struct e -> 
-            let (sty, _) = StringMap.find e struct_decls in
-            let ptr = L.build_alloca (pointer_t sty) n builder in
-            let sbody = L.build_malloc sty (n ^ "_body") builder in
-            ignore(L.build_store sbody ptr builder); ptr
+            let (sty, _) = StringMap.find e struct_decls
+            in L.build_alloca (pointer_t sty) n builder
         | _ -> L.build_alloca (ltype_of_typ t) n builder
       in StringMap.add n local_var m
       in
@@ -205,6 +203,10 @@ let translate (globals, functions, structs) =
         and e' = int_to_float builder e
         and s' = L.build_load (lookup s) s builder in
         L.build_call matrix_assign_funct [| s'; i'; j'; e' |] "matrix_assign" builder
+
+      | SStructLit id -> 
+        let (sty, _) = StringMap.find id struct_decls
+        in L.build_malloc sty (id ^ "_body") builder
 
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'

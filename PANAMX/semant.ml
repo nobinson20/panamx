@@ -177,6 +177,8 @@ let check (globals, functions, structs) =
               SMatIndex(_, (ti, ei), (tj, ej)) -> (Float, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
             | _ -> raise (Failure ("should not happen - matrix")))
 
+      | StructLit id -> (Struct(id), SStructLit(id))
+
     and check_matrix_index (id : string) (i : expr) (j : expr) = 
         let (ti, ei) = expr i 
         and (tj, ej) = expr j in

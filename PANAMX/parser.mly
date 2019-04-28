@@ -131,6 +131,7 @@ expr:
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
   | ID HEIGHT        { Call("matrixHeight", [Id($1)]) }
   | ID WIDTH         { Call("matrixWidth", [Id($1)]) }
+  | LT STRUCT ID GT { StructLit($3)   }
 
 matrixlit:
     arraylit                { [$1] }

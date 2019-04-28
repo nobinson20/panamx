@@ -4,8 +4,8 @@ struct Node {
 };
 
 int main() {
-    struct Node ptr1;
-    struct Node ptr2;
+    struct Node p;
+    p = <struct Node>;
     prints("Nice");
     return 0;
 }
