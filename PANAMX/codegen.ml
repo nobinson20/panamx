@@ -113,6 +113,31 @@ let translate (globals, functions, structs) =
   let matrix_width_func : L.llvalue =
       L.declare_function "getWidth" matrix_width_t the_module in
 
+  let matrix_sum_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_sum_func : L.llvalue =
+      L.declare_function "sum" matrix_sum_t the_module in
+
+  let matrix_mean_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_mean_func : L.llvalue =
+      L.declare_function "mean" matrix_mean_t the_module in
+
+  let matrix_trans_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_trans_func : L.llvalue =
+      L.declare_function "trans" matrix_trans_t the_module in
+
+  let matrix_rref_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_rref_func : L.llvalue =
+      L.declare_function "rref" matrix_rref_t the_module in
+
+  let matrix_rank_t : L.lltype =
+      L.function_type i32_t [| matrix_t |] in
+  let matrix_rank_func : L.llvalue =
+      L.declare_function "rank" matrix_rank_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -318,6 +343,17 @@ let translate (globals, functions, structs) =
         L.build_call matrix_height_func [| expr builder e |] "matrix_height" builder
       | SCall ("matrixWidth", [e]) ->
         L.build_call matrix_width_func [| expr builder e |] "matrix_width" builder
+
+      | SCall ("matrixSum", [e]) ->
+        L.build_call matrix_sum_func [| expr builder e |] "matrix_sum" builder
+      | SCall ("matrixMean", [e]) ->
+        L.build_call matrix_mean_func [| expr builder e |] "matrix_mean" builder
+      | SCall ("matrixTrans", [e]) ->
+        L.build_call matrix_trans_func [| expr builder e |] "matrix_trans" builder
+      | SCall ("matrixReduce", [e]) ->
+        L.build_call matrix_rref_func [| expr builder e |] "matrix_rref" builder
+      | SCall ("matrixRank", [e]) ->
+        L.build_call matrix_rank_func [| expr builder e |] "matrix_rank" builder
 
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in

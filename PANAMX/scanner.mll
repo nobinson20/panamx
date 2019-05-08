@@ -50,6 +50,11 @@ rule token = parse
 | "matrix" { MATRIX }
 | "struct" { STRUCT }
 | ".height" { HEIGHT }
+| ".sum" { MATSUM }
+| ".mean" { MATMEAN }
+| ".trans" { MATTRANS }
+| ".rref" { MATRREF }
+| ".rank" { MATRANK }
 | ".width"  { WIDTH }
 | digits as lxm { LITERAL(int_of_string lxm) }
 | digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
