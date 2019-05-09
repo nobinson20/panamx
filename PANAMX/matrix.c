@@ -91,6 +91,104 @@ int getWidth(matrix m) {
         return m->col;
 }
 
+matrix addMatrixDouble(matrix m, double n, int minus) {
+	if (m == NULL || m->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+	if (minus) {
+		n = -n;
+	}
+	int h = m->row, w = m->col;
+	matrix result = initMatrix(h, w);
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			result->mat[i][j] = m->mat[i][j] + n;
+		}
+	}
+	return result;
+}
+
+matrix subDoubleMatrix(double n, matrix m) {
+	if (m == NULL || m->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+	int h = m->row, w = m->col;
+	matrix result = initMatrix(h, w);
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			result->mat[i][j] = n - m->mat[i][j];
+		}
+	}
+	return result;
+}
+
+matrix addMatrixMatrix(matrix m, matrix n, int minus) {
+	if (m == NULL || m->mat == NULL || n == NULL || n->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+	if (m->row != n->row || m->col != n->col) {
+		perror("Error in matrix addition: dimension mismatched");
+        exit(1);
+	}
+	int h = m->row, w = m->col;
+	matrix result = initMatrix(h, w);
+	if (minus) {
+		for (int i = 0; i < h; i++) 
+			for (int j = 0; j < w; j++) 
+				result->mat[i][j] = m->mat[i][j] - n->mat[i][j];
+	}
+	else {
+		for (int i = 0; i < h; i++) 
+			for (int j = 0; j < w; j++) 
+				result->mat[i][j] = m->mat[i][j] + n->mat[i][j];
+	}
+	return result;
+}
+
+matrix mulMatrixDouble(matrix m, double n, int div) {
+	if (m == NULL || m->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+	int h = m->row, w = m->col;
+	matrix result = initMatrix(h, w);
+	if (div) {
+		n = 1 / n;
+	}
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			result->mat[i][j] = m->mat[i][j] * n;
+		}
+	}
+	return result;
+}
+
+matrix mulMatrixMatrix(matrix m, matrix n) {
+	if (m == NULL || m->mat == NULL || n == NULL || n->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+	if (m->col != n->row) {
+		perror("Error in matrix multiplication: dimension mismatched");
+        exit(1);
+	}
+	int h = m->row, w = n->col, p = m->col;
+	matrix result = initMatrix(h, w);
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			double tmp = 0;
+			for (int k = 0; k < p; k++) {
+				tmp += m->mat[i][k] * n->mat[k][j];
+			}
+			result->mat[i][j] = tmp;
+		}
+	}
+	return result;
+}
+
 // helper function for rref() function, swaps rows of given matrix by reference
 static void swap(matrix m, int a, int b) {
 	double temp;

@@ -151,10 +151,12 @@ let check (globals, functions, structs) =
           and (t2, e2') = expr e2 in
           (* All binary operators require operands of the same type *)
           let same = t1 = t2 in
+          let is_float = t1 != Matrix && t2 != Matrix && (t1 = Float || t2 = Float) in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
             Add | Sub | Mult | Div | Mod when same && t1 = Int -> Int
-          | Add | Sub | Mult | Div | Mod when t1 = Float || t2 = Float -> Float
+          | Add | Sub | Mult | Div | Mod when is_float -> Float
+          | Add | Sub | Mult | Div when t1 = Matrix || t2 = Matrix -> Matrix
           | Equal | Neq when same -> Bool
           | Less | Leq | Greater | Geq when same && (t1 = Int || t1 = Float) -> Bool
           | And | Or when same && t1 = Bool -> Bool

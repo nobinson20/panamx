@@ -113,6 +113,31 @@ let translate (globals, functions, structs) =
   let matrix_width_func : L.llvalue =
       L.declare_function "getWidth" matrix_width_t the_module in
 
+  let add_md_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; float_t; i32_t |] in
+  let add_md_func : L.llvalue =
+      L.declare_function "addMatrixDouble" add_md_t the_module in
+
+  let add_mm_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; matrix_t; i32_t |] in
+  let add_mm_func : L.llvalue =
+      L.declare_function "addMatrixMatrix" add_mm_t the_module in
+
+  let sub_dm_t : L.lltype =
+      L.function_type matrix_t [| float_t; matrix_t |] in
+  let sub_dm_func : L.llvalue =
+      L.declare_function "subDoubleMatrix" sub_dm_t the_module in
+
+  let mul_md_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; float_t; i32_t |] in
+  let mul_md_func : L.llvalue =
+      L.declare_function "mulMatrixDouble" mul_md_t the_module in
+
+  let mul_mm_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; matrix_t |] in
+  let mul_mm_func : L.llvalue =
+      L.declare_function "mulMatrixMatrix" mul_mm_t the_module in
+
   let matrix_sum_t : L.lltype =
       L.function_type i32_t [| matrix_t |] in
   let matrix_sum_func : L.llvalue =
@@ -252,7 +277,7 @@ let translate (globals, functions, structs) =
 
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
-      | SBinop (e1, op, e2) when fst e1 = A.Int && fst e2 = A.Int ->
+      | SBinop (((ty1, _) as e1), op, ((ty2, _) as e2)) when ty1 = A.Int && ty2 = A.Int ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in
           (match op with
@@ -270,7 +295,7 @@ let translate (globals, functions, structs) =
           | A.Greater -> L.build_icmp L.Icmp.Sgt
           | A.Geq     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
-      | SBinop (e1, op, e2) when fst e1 = A.Bool && fst e2 = A.Bool ->
+      | SBinop (((ty1, _) as e1), op, ((ty2, _) as e2)) when ty1 = A.Bool && ty2 = A.Bool ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in
           (match op with
@@ -280,6 +305,35 @@ let translate (globals, functions, structs) =
           | A.Neq   -> L.build_icmp L.Icmp.Ne
           | _       -> raise (Failure "invalid operation on bool")
           ) e1' e2' "tmp" builder
+      | SBinop (((ty1, _) as e1), op, ((ty2, _) as e2)) when ty1 = A.Matrix || ty2 = A.Matrix ->
+        let e1' = int_to_float builder e1
+        and e2' = int_to_float builder e2 in
+          (match op with
+            A.Add  -> 
+              if ty1 = ty2 && ty1 = A.Matrix 
+              then L.build_call add_mm_func [| e1'; e2'; L.const_int i32_t 0 |] "add_matrix" builder
+              else if ty1 = A.Matrix 
+              then L.build_call add_md_func [| e1'; e2'; L.const_int i32_t 0 |] "add_matrix" builder
+              else L.build_call add_md_func [| e2'; e1'; L.const_int i32_t 0 |] "add_matrix" builder
+          | A.Sub  ->
+              if ty1 = ty2 && ty1 = A.Matrix 
+              then L.build_call add_mm_func [| e1'; e2'; L.const_int i32_t 1 |] "sub_matrix" builder
+              else if ty1 = A.Matrix 
+              then L.build_call add_md_func [| e1'; e2'; L.const_int i32_t 1 |] "sub_matrix" builder
+              else L.build_call sub_dm_func [| e1'; e2' |] "sub_matrix" builder
+          | A.Mult ->
+              if ty1 = ty2 && ty1 = A.Matrix 
+              then L.build_call mul_mm_func [| e1'; e2' |] "mul_matrix" builder
+              else if ty1 = A.Matrix 
+              then L.build_call mul_md_func [| e1'; e2'; L.const_int i32_t 0 |] "mul_matrix" builder
+              else L.build_call mul_md_func [| e2'; e1'; L.const_int i32_t 0 |] "mul_matrix" builder
+          | A.Div ->
+              if ty1 = A.Matrix && ty2 != A.Matrix
+              then L.build_call mul_md_func [| e1'; e2'; L.const_int i32_t 1 |] "div_matrix" builder
+              else raise (Failure "illegal operation / on matrix")
+          | _      -> raise (Failure 
+              ("illegal operation " ^ (A.string_of_op op) ^ " on matrix"))
+          )
       | SBinop (e1, op, e2) ->
         let e1' = int_to_float builder e1
         and e2' = int_to_float builder e2 in
