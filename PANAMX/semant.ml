@@ -47,11 +47,11 @@ let check (globals, functions, structs) =
         ("free", [(Matrix, "x")], Void);
         ("matrixHeight", [(Matrix, "x")], Int);
         ("matrixWidth", [(Matrix, "x")], Int);
-        ("matrixSum", [(Matrix, "x")], Doubke);
-        ("matrixMean", [(Matrix, "x")], Double); 
+        ("matrixSum", [(Matrix, "x")], Float);
+        ("matrixMean", [(Matrix, "x")], Float); 
         ("matrixTrans", [(Matrix, "x")], Matrix); 
         ("matrixReduce", [(Matrix, "x")], Matrix); 
-        ("matrixRank", [(Matrix, "x")], Double) ]
+        ("matrixRank", [(Matrix, "x")], Float) ]
   in
 
   (* Add function name to symbol table *)

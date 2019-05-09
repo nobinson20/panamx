@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Note: matrix is a pointer type
 typedef struct Matrix {
     int row;
     int col;
@@ -91,28 +92,28 @@ int getWidth(matrix m) {
 }
 
 // helper function for rref() function, swaps rows of given matrix by reference
-static void swap(matrix *m, int a, int b) {
+static void swap(matrix m, int a, int b) {
 	double temp;
-	if (m == NULL | (*m)->mat == NULL) {
+	if (m == NULL || m->mat == NULL) {
 		perror("Empty Matrix");
-		exit(1);	
+		exit(1);
 	}
-	else if ((*m)->row <= a || (*m)->col <= b) {
+	else if (m->row <= a || m->col <= b) {
 		perror("Matrix Index Out of Bounds");
 		exit(1);
 	}
 	else {
-		for (int i = 0; i < (*m)->col; i++) {
-			temp = (*m)->mat[i][a];
-			(*m)->mat[i][a] = (*m)->mat[i][b];
-			(*m)->mat[i][b] = temp;
-		}	
+		for (int i = 0; i < m->col; i++) {
+			temp = m->mat[i][a];
+			m->mat[i][a] = m->mat[i][b];
+			m->mat[i][b] = temp;
+		}
 	}
 }
 
 // helper function for rref() function, divides specified row in matrix by a non-zero scalar
-static void divideRow(matrix *m, int row, double scalar) {
-	if (m == NULL || (*m)->mat == NULL) {
+static void divideRow(matrix m, int row, double scalar) {
+	if (m == NULL || m->mat == NULL) {
 		perror("Empty Matrix");
 		exit(1);
 	}
@@ -120,31 +121,31 @@ static void divideRow(matrix *m, int row, double scalar) {
 		perror("Divide By Zero Error");
 		exit(1);
 	}
-	else if ((*m)->row <= row) {
+	else if (m->row <= row) {
 		perror("Matrix Index Out of Bounds");
 		exit(1);
 	}
 	else {
-		for (int i = 0; i < (*m)->col; i++) {
-			(*m)->mat[i][row] *= scalar;
+		for (int i = 0; i < m->col; i++) {
+			m->mat[i][row] *= scalar;
 		}
 	}
 }
 
 // helper function for rref() function, subtracts a multiple of one row from another
 // (e.g., row a = row a - row b * (scalar)
-static void subtractRow(matrix *m, int a, int b, double scalar) {
-	if (m == NULL || (*m)->mat == NULL) {
+static void subtractRow(matrix m, int a, int b, double scalar) {
+	if (m == NULL || m->mat == NULL) {
         perror("Empty Matrix");
         exit(1);
     }
-    else if ((*m)->row < a || (*m)->row < b) { // note: should this be <= 
+    else if (m->row <= a || m->row <= b) { // note: should this be <= 
         perror("Matrix Index Out of Bounds");
         exit(1);
     }
 	else {
-		for (int i = 0; (*m)->col; i++) {
-			(*m)->mat[i][a] -= (*m)->mat[i][b]*scalar;
+		for (int i = 0; m->col; i++) {
+			m->mat[i][a] -= m->mat[i][b]*scalar;
 		}
 	}	
 }
@@ -152,7 +153,7 @@ static void subtractRow(matrix *m, int a, int b, double scalar) {
 // swaps rows a and b from the given matrix m
 matrix rowSwap(matrix m, int a, int b) {
 	// should not work if matrix is empty
-	if (m == NULL | m->mat == NULL) {
+	if (m == NULL || m->mat == NULL) {
 		perror("Empty Matrix");
 		exit(1);
     }
@@ -186,7 +187,7 @@ matrix rowSwap(matrix m, int a, int b) {
 // swaps columns a and b from the given matrix m
 matrix colSwap(matrix m, int a, int b) {
 	// should not work if matrix is empty
-    if (m == NULL | m->mat == NULL) {
+    if (m == NULL || m->mat == NULL) {
         perror("Empty Matrix");
         exit(1);
     }
@@ -337,12 +338,12 @@ matrix rref(matrix m) {
 			}
 			// ... and swap the row containing that non-zero value
 			else {
-				swap(&new, i, srow);
-				divideRow(&new, i, new->mat[i][j]);
+				swap(new, i, srow);
+				divideRow(new, i, new->mat[i][j]);
 					k = i + 1;
 				while (k < new->row) {
 					if (new->mat[k][j] != 0) {
-						subtractRow(&new, k, i, new->mat[k][j]);
+						subtractRow(new, k, i, new->mat[k][j]);
 					}
 					k++;
 				}
@@ -352,11 +353,11 @@ matrix rref(matrix m) {
 		}
 		// entry new[i][j] is non-zero, normalize
 		else {
-			divideRow(&new, i, new->mat[i][j]);
+			divideRow(new, i, new->mat[i][j]);
 			int k = i + 1;
 			while(k < new->row) {
 				if(new->mat[k][j] != 0) {
-					subtractRow(&new, k, i, new->mat[k][j]);
+					subtractRow(new, k, i, new->mat[k][j]);
 				}
 				k++;
 			}
@@ -369,22 +370,20 @@ matrix rref(matrix m) {
 
 // returns rank of a given matrix
 double rank(matrix m) {
-        // get the reduced row echelon form of given matrix
+    // get the reduced row echelon form of given matrix
     matrix new = rref(m);
     double rnk = 0;
-        // count the number of non-zero rows
-        for (int i = 0; i < new->row; i++) {
-                int zero = 1;
-                for (int j = 0; j < new->col; j++) {
-                        if (new->mat[i][j] != 0) {
-                                zero = 0;
-                        }
-                }
-                if (zero == 0) {
-                        rnk++;
-                }
-        }
-        return rnk;
+	// count the number of non-zero rows
+	for (int i = 0; i < new->row; i++) {
+			int zero = 1;
+			for (int j = 0; j < new->col; j++) {
+					if (new->mat[i][j] != 0) {
+							zero = 0;
+					}
+			}
+			if (zero == 0) {
+					rnk++;
+			}
+	}
+	return rnk;
 }
-
-
