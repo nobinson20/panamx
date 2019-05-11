@@ -139,27 +139,27 @@ let translate (globals, functions, structs) =
       L.declare_function "mulMatrixMatrix" mul_mm_t the_module in
 
   let matrix_sum_t : L.lltype =
-      L.function_type i32_t [| matrix_t |] in
+      L.function_type float_t [| matrix_t |] in
   let matrix_sum_func : L.llvalue =
       L.declare_function "sum" matrix_sum_t the_module in
 
   let matrix_mean_t : L.lltype =
-      L.function_type i32_t [| matrix_t |] in
+      L.function_type float_t [| matrix_t |] in
   let matrix_mean_func : L.llvalue =
       L.declare_function "mean" matrix_mean_t the_module in
 
   let matrix_trans_t : L.lltype =
-      L.function_type i32_t [| matrix_t |] in
+      L.function_type matrix_t [| matrix_t |] in
   let matrix_trans_func : L.llvalue =
       L.declare_function "trans" matrix_trans_t the_module in
 
   let matrix_rref_t : L.lltype =
-      L.function_type i32_t [| matrix_t |] in
+      L.function_type matrix_t [| matrix_t |] in
   let matrix_rref_func : L.llvalue =
       L.declare_function "rref" matrix_rref_t the_module in
 
   let matrix_rank_t : L.lltype =
-      L.function_type i32_t [| matrix_t |] in
+      L.function_type float_t [| matrix_t |] in
   let matrix_rank_func : L.llvalue =
       L.declare_function "rank" matrix_rank_t the_module in
 
