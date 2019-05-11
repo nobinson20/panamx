@@ -5,6 +5,13 @@
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
 
+only_px_tests="tests2/px_tests/test-*.px"
+only_mc_tests="tests2/mc_tests/test-*.px tests2/mc_tests/fail-*.px"
+all_tests="tests2/px_tests/test-*.px tests2/mc_tests/test-*.px tests2/mc_tests/fail-*.px"
+
+# Change this line to set directories
+setdirs=all_tests
+
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
 
@@ -175,7 +182,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.px tests/fail-*.px"
+    files=$all_tests
 fi
 
 for file in $files

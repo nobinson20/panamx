@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Add customized test file here
-files="tests/test-matrix6.mc"
+files="tests/test-matrix6.px"
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
@@ -28,7 +28,7 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: testall.sh [options] [.mc files]"
+    echo "Usage: testall.sh [options] [.px files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -77,8 +77,8 @@ RunFail() {
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.px//'`
+    reffile=`echo $1 | sed 's/.px$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -112,8 +112,8 @@ Check() {
 CheckFail() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.px//'`
+    reffile=`echo $1 | sed 's/.px$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."

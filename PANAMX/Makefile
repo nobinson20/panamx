@@ -52,8 +52,8 @@ FAILS = \
   func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \
   return1 return2 while1 while2 printhelloworld incdec ops3
 
-TESTFILES = $(TESTS:%=test-%.mc) $(TESTS:%=test-%.out) \
-	    $(FAILS:%=fail-%.mc) $(FAILS:%=fail-%.err)
+TESTFILES = $(TESTS:%=test-%.px) $(TESTS:%=test-%.out) \
+	    $(FAILS:%=fail-%.px) $(FAILS:%=fail-%.err)
 
 TARFILES = ast.ml sast.ml codegen.ml Makefile _tags panamx.ml parser.mly \
 	README scanner.mll semant.ml testall.sh \
