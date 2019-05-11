@@ -31,9 +31,9 @@ let translate (globals, functions, structs) =
   and i8_t       = L.i8_type     context
   and i1_t       = L.i1_type     context
   and float_t    = L.double_type context
-  and void_t     = L.void_type   context 
-  and pointer_t  = L.pointer_type 
-  and array_t    = L.array_type       
+  and void_t     = L.void_type   context
+  and pointer_t  = L.pointer_type
+  and array_t    = L.array_type
   and matrix_t   = L.pointer_type (L.named_struct_type context "Matrix")
   in
 
@@ -58,7 +58,7 @@ let translate (globals, functions, structs) =
     List.fold_left global_var StringMap.empty globals in
 
   let struct_decls : (L.lltype * sstruct_decl) StringMap.t =
-    let define_struct m sdecl = 
+    let define_struct m sdecl =
       let get_sbody_ty ((ty, _) : A.bind) = ltype_of_typ ty in
       let sname = sdecl.ssname
       and svar_type = Array.of_list (List.map get_sbody_ty sdecl.ssvar) in
@@ -168,6 +168,11 @@ let translate (globals, functions, structs) =
   let matrix_rank_func : L.llvalue =
       L.declare_function "rank" matrix_rank_t the_module in
 
+  let matrix_det_t : L.lltype =
+      L.function_type float_t [| matrix_t |] in
+  let matrix_det_func : L.llvalue =
+      L.declare_function "det" matrix_det_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -201,7 +206,7 @@ let translate (globals, functions, structs) =
        * resulting registers to our map *)
       and add_local m (t, n) =
       let local_var = match t with
-          A.Struct e -> 
+          A.Struct e ->
             let (sty, _) = StringMap.find e struct_decls
             in L.build_alloca (pointer_t sty) n builder
         | _ -> L.build_alloca (ltype_of_typ t) n builder
@@ -237,7 +242,7 @@ let translate (globals, functions, structs) =
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
 
-      | SMatLit (rows, cols, e) -> 
+      | SMatLit (rows, cols, e) ->
         let build_matrix_t : L.lltype =
             L.function_type matrix_t [| i32_t; i32_t; pointer_t float_t |] in
         let build_matrix_func : L.llvalue =
@@ -245,9 +250,9 @@ let translate (globals, functions, structs) =
         let llarray = L.const_array float_t (Array.of_list (List.map (int_to_float builder) e)) in
         let array_ptr_ty = array_t float_t (rows * cols) in
         let llptr = L.build_alloca array_ptr_ty "matrix_array" builder in
-        ignore(L.build_store llarray llptr builder); 
+        ignore(L.build_store llarray llptr builder);
         let ptr = L.build_gep llptr [| L.const_int i32_t 0; L.const_int i32_t 0 |] "get_array_ptr" builder in
-        L.build_call build_matrix_func 
+        L.build_call build_matrix_func
           [| L.const_int i32_t rows; L.const_int i32_t cols; ptr |] "init_matrix" builder
 
       | SMatLitEmpty (i, j) ->
@@ -255,27 +260,27 @@ let translate (globals, functions, structs) =
         and cols = expr builder j in
         L.build_call build_matrix_empty_func [| rows; cols |] "init_matrix_empty" builder
 
-      | SMatIndex (s, i, j) -> 
-        let i' = expr builder i 
-        and j' = expr builder j 
+      | SMatIndex (s, i, j) ->
+        let i' = expr builder i
+        and j' = expr builder j
         and s' = L.build_load (lookup s) s builder in
         L.build_call matrix_access_func [| s'; i'; j' |] "matrix_access" builder
 
-      | SMatAssign (s, i, j, e) -> 
+      | SMatAssign (s, i, j, e) ->
         let i' = expr builder i
         and j' = expr builder j
         and e' = int_to_float builder e
         and s' = L.build_load (lookup s) s builder in
         L.build_call matrix_assign_funct [| s'; i'; j'; e' |] "matrix_assign" builder
 
-      | SStructLit id -> 
+      | SStructLit id ->
         let (sty, _) = StringMap.find id struct_decls
         in L.build_malloc sty (id ^ "_body") builder
 
       | SMember (s, m) -> let mem_p = get_smem_ptr builder s m in
         L.build_load mem_p (s ^ m) builder
 
-      | SMemAssign (s, m, e) -> 
+      | SMemAssign (s, m, e) ->
         let e' = expr builder e in
         let mem_p = get_smem_ptr builder s m in
         ignore(L.build_store e' mem_p builder); e'
@@ -315,22 +320,22 @@ let translate (globals, functions, structs) =
         let e1' = int_to_float builder e1
         and e2' = int_to_float builder e2 in
           (match op with
-            A.Add  -> 
-              if ty1 = ty2 && ty1 = A.Matrix 
+            A.Add  ->
+              if ty1 = ty2 && ty1 = A.Matrix
               then L.build_call add_mm_func [| e1'; e2'; L.const_int i32_t 0 |] "add_matrix" builder
-              else if ty1 = A.Matrix 
+              else if ty1 = A.Matrix
               then L.build_call add_md_func [| e1'; e2'; L.const_int i32_t 0 |] "add_matrix" builder
               else L.build_call add_md_func [| e2'; e1'; L.const_int i32_t 0 |] "add_matrix" builder
           | A.Sub  ->
-              if ty1 = ty2 && ty1 = A.Matrix 
+              if ty1 = ty2 && ty1 = A.Matrix
               then L.build_call add_mm_func [| e1'; e2'; L.const_int i32_t 1 |] "sub_matrix" builder
-              else if ty1 = A.Matrix 
+              else if ty1 = A.Matrix
               then L.build_call add_md_func [| e1'; e2'; L.const_int i32_t 1 |] "sub_matrix" builder
               else L.build_call sub_dm_func [| e1'; e2' |] "sub_matrix" builder
           | A.Mult ->
-              if ty1 = ty2 && ty1 = A.Matrix 
+              if ty1 = ty2 && ty1 = A.Matrix
               then L.build_call mul_mm_func [| e1'; e2' |] "mul_matrix" builder
-              else if ty1 = A.Matrix 
+              else if ty1 = A.Matrix
               then L.build_call mul_md_func [| e1'; e2'; L.const_int i32_t 0 |] "mul_matrix" builder
               else L.build_call mul_md_func [| e2'; e1'; L.const_int i32_t 0 |] "mul_matrix" builder
           | A.Div ->
@@ -341,7 +346,7 @@ let translate (globals, functions, structs) =
               L.build_call mul_ew_mm_func [| e1'; e2'; L.const_int i32_t 0 |] "elewise_matrix" builder
           | A.Mdiv when ty1 = ty2 && ty1 = A.Matrix ->
               L.build_call mul_ew_mm_func [| e1'; e2'; L.const_int i32_t 1 |] "elewise_matrix" builder
-          | _      -> raise (Failure 
+          | _      -> raise (Failure
               ("illegal operation " ^ (A.string_of_op op) ^ " on matrix"))
           )
       | SBinop (e1, op, e2) ->
@@ -369,23 +374,23 @@ let translate (globals, functions, structs) =
             A.Neg when t = A.Float -> L.build_fneg e' "tmp" builder
           | A.Neg                  -> L.build_neg e' "tmp" builder
           | A.Not                  -> L.build_not e' "tmp" builder
-          | A.Inc                  -> 
-            L.build_store (L.build_add e' (L.const_int i32_t 1) "tmp" builder) (lookup (match ex with 
-              SId id -> id 
+          | A.Inc                  ->
+            L.build_store (L.build_add e' (L.const_int i32_t 1) "tmp" builder) (lookup (match ex with
+              SId id -> id
             | _ -> raise (Failure "increment error"))) builder
-          | A.Dec                  -> 
-            L.build_store (L.build_sub e' (L.const_int i32_t 1) "tmp" builder) (lookup (match ex with 
-              SId id -> id 
+          | A.Dec                  ->
+            L.build_store (L.build_sub e' (L.const_int i32_t 1) "tmp" builder) (lookup (match ex with
+              SId id -> id
             | _ -> raise (Failure "decrement error"))) builder
-          ) 
+          )
       | SCall ("print", [e])
           (* (match tt with
-            A.Int 
-          | A.Bool -> L.build_call printf_func 
+            A.Int
+          | A.Bool -> L.build_call printf_func
               [| int_format_str ; (expr builder e) |] "printf" builder
-          | A.Float -> L.build_call printf_func 
+          | A.Float -> L.build_call printf_func
               [| float_format_str ; (expr builder e) |] "printf" builder
-          | A.String -> L.build_call printf_func 
+          | A.String -> L.build_call printf_func
               [| string_format_str; (expr builder e) |] "printf" builder
           | _ -> raise (Failure "cannot print")) *)
       | SCall ("printb", [e]) ->
@@ -419,6 +424,8 @@ let translate (globals, functions, structs) =
         L.build_call matrix_rref_func [| expr builder e |] "matrix_rref" builder
       | SCall ("rank", [e]) ->
         L.build_call matrix_rank_func [| expr builder e |] "matrix_rank" builder
+      | SCall ("det", [e]) ->
+        L.build_call matrix_det_func [| expr builder e |] "matrix_det" builder
 
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
@@ -428,19 +435,19 @@ let translate (globals, functions, structs) =
                       | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list llargs) result builder
 
-    and int_to_float builder e = 
+    and int_to_float builder e =
           let e' = expr builder e in
           match fst e with
             A.Int -> L.build_sitofp e' float_t "tmp" builder
           | _     -> e'
 
     (* get the member m's pointer in struct *)
-    and get_smem_ptr builder s m = 
+    and get_smem_ptr builder s m =
           let sname = match (type_of_identifier s) with
                 A.Struct n -> n
               | _ -> raise (Failure ("Invalid access(.) operation for " ^ s)) in
           let (_, sdecl) = StringMap.find sname struct_decls in
-          let idx = 
+          let idx =
             let rec find_idx = function
                 [] -> raise (Failure ("Struct " ^ sname ^ " does not have member " ^ m))
               | (_, var) :: _ when var = m -> 0

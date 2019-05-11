@@ -38,7 +38,7 @@ let check (globals, functions, structs) =
       fname = name;
       formals = arg_list;
       locals = []; body = [] } map
-    in List.fold_left add_bind StringMap.empty 
+    in List.fold_left add_bind StringMap.empty
       [ ("print",  [(Int, "x")], Void);
         ("printb", [(Bool, "x")], Void);
         ("prints", [(String, "x")], Void);
@@ -48,10 +48,11 @@ let check (globals, functions, structs) =
         ("matrixHeight", [(Matrix, "x")], Int);
         ("matrixWidth",  [(Matrix, "x")], Int);
         ("sum",    [(Matrix, "x")], Float);
-        ("mean",   [(Matrix, "x")], Float); 
-        ("trans",  [(Matrix, "x")], Matrix); 
-        ("rref",   [(Matrix, "x")], Matrix); 
-        ("rank",   [(Matrix, "x")], Float) ]
+        ("mean",   [(Matrix, "x")], Float);
+        ("trans",  [(Matrix, "x")], Matrix);
+        ("rref",   [(Matrix, "x")], Matrix);
+        ("rank",   [(Matrix, "x")], Float);
+        ("det",    [(Matrix, "x")], Float);]
   in
 
   (* Add function name to symbol table *)
@@ -180,10 +181,10 @@ let check (globals, functions, structs) =
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
 
-      | MatLit elts -> 
+      | MatLit elts ->
         let rows = List.length elts in
         if rows = 0 then raise (Failure ("matrix height cannot be zero")) else
-        let cols = List.length (List.hd elts) in 
+        let cols = List.length (List.hd elts) in
         if cols = 0 then raise (Failure ("matrix width cannot be zero")) else
         let selts = List.map expr (List.fold_left (fun x y -> x @ y) [] elts) in
         if List.fold_left (fun x y -> x && (fst y = Int || fst y = Float)) true selts
@@ -208,11 +209,11 @@ let check (globals, functions, structs) =
 
       | StructLit id -> ignore(find_struct id); (Struct(id), SStructLit(id))
 
-      | Member (s, m) -> 
+      | Member (s, m) ->
         let n = get_struct_name s in
         let ty = get_smember_type n m in (ty, SMember(s, m))
 
-      | MemAssign (s, m, e) as ex -> 
+      | MemAssign (s, m, e) as ex ->
         let n = get_struct_name s in
         let lt = get_smember_type n m in
         let (rt, e') = expr e in
@@ -220,8 +221,8 @@ let check (globals, functions, structs) =
             string_of_typ rt ^ " in " ^ string_of_expr ex
         in (check_assign lt rt err, SMemAssign(s, m, (rt, e')))
 
-    and check_matrix_index (id : string) (i : expr) (j : expr) = 
-        let (ti, ei) = expr i 
+    and check_matrix_index (id : string) (i : expr) (j : expr) =
+        let (ti, ei) = expr i
         and (tj, ej) = expr j in
         if ti != Int || tj != Int then raise (Failure ("index must be integer"))
         else (Float, SMatIndex(id, (ti, ei), (tj, ej)))
@@ -269,17 +270,17 @@ let check (globals, functions, structs) =
   in
 
   (**** Check structs ****)
-  let check_structs (st_list : struct_decl list) = 
+  let check_structs (st_list : struct_decl list) =
     (* check struct name *)
     let rec struct_dups = function
         [] -> ()
-      | (s1 :: s2 :: _) when s1.sname = s2.sname -> 
+      | (s1 :: s2 :: _) when s1.sname = s2.sname ->
         raise (Failure ("duplicate struct name " ^ s1.sname))
       | _ :: tl -> struct_dups tl
     in struct_dups st_list;
 
     (* check struct body *)
-    let struct_binds (st : struct_decl) = 
+    let struct_binds (st : struct_decl) =
       if List.length st.svar = 0 then raise (Failure ("Empty struct body"))
       else check_binds "struct" st.svar
     in List.iter struct_binds st_list;

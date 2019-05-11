@@ -32,7 +32,7 @@ matrix buildMatrix(int row, int col, double *arr) {
 matrix buildMatrixEmpty(int row, int col) {
     matrix m = initMatrix(row, col);
     for (int i = 0; i < row; i++) {
-	    for (int j = 0; j < col; j++) { 
+	    for (int j = 0; j < col; j++) {
             m->mat[i][j] = 0;
         }
     }
@@ -136,13 +136,13 @@ matrix addMatrixMatrix(matrix m, matrix n, int minus) {
 	int h = m->row, w = m->col;
 	matrix result = initMatrix(h, w);
 	if (minus) {
-		for (int i = 0; i < h; i++) 
-			for (int j = 0; j < w; j++) 
+		for (int i = 0; i < h; i++)
+			for (int j = 0; j < w; j++)
 				result->mat[i][j] = m->mat[i][j] - n->mat[i][j];
 	}
 	else {
-		for (int i = 0; i < h; i++) 
-			for (int j = 0; j < w; j++) 
+		for (int i = 0; i < h; i++)
+			for (int j = 0; j < w; j++)
 				result->mat[i][j] = m->mat[i][j] + n->mat[i][j];
 	}
 	return result;
@@ -201,13 +201,13 @@ matrix mulElementWiseMatrix(matrix m, matrix n, int div) {
 	int h = m->row, w = m->col;
 	matrix result = initMatrix(h, w);
 	if (div) {
-		for (int i = 0; i < h; i++) 
-			for (int j = 0; j < w; j++) 
+		for (int i = 0; i < h; i++)
+			for (int j = 0; j < w; j++)
 				result->mat[i][j] = m->mat[i][j] / n->mat[i][j];
 	}
 	else {
-		for (int i = 0; i < h; i++) 
-			for (int j = 0; j < w; j++) 
+		for (int i = 0; i < h; i++)
+			for (int j = 0; j < w; j++)
 				result->mat[i][j] = m->mat[i][j] * n->mat[i][j];
 	}
 	return result;
@@ -261,7 +261,7 @@ static void subtractRow(matrix m, int a, int b, double scalar) {
         perror("Empty Matrix");
         exit(1);
     }
-    else if (m->row <= a || m->row <= b) { // note: should this be <= 
+    else if (m->row <= a || m->row <= b) { // note: should this be <=
         perror("Matrix Index Out of Bounds");
         exit(1);
     }
@@ -269,7 +269,7 @@ static void subtractRow(matrix m, int a, int b, double scalar) {
 		for (int i = 0; m->col; i++) {
 			m->mat[i][a] -= m->mat[i][b]*scalar;
 		}
-	}	
+	}
 }
 
 // swaps rows a and b from the given matrix m
@@ -285,7 +285,7 @@ matrix rowSwap(matrix m, int a, int b) {
 		exit(1);
     }
     // should work for all other cases
-    else { 
+    else {
 		// create new matrix with all entries initialized to zero
         matrix new = buildMatrixEmpty(m->row, m->col);
         // iterate through all entries to initialize correct values
@@ -297,7 +297,7 @@ matrix rowSwap(matrix m, int a, int b) {
 				else if (i == b) {
 					new->mat[i][j] = m->mat[a][j];
 				}
-				else { 
+				else {
 					new->mat[i][j] = m->mat[i][j];
 				}
 			}
@@ -361,7 +361,7 @@ double sum(matrix m) {
     return s;
 }
 
-// returns the average of all entries in a matrix m; for now, only works for 
+// returns the average of all entries in a matrix m; for now, only works for
 // double type
 double mean(matrix m) {
     double avg = 0;
@@ -403,22 +403,57 @@ matrix trans(matrix m) {
             }
         }
 		return new;
-    }    
+    }
 }
 
 // returns an "array" (e.g., 1 x N matrix) of eigenvalues for given matrix
 matrix eig(matrix m) {
-    // TODO	
+    // TODO
     return NULL;
+}
+
+void getCofactor(matrix m, matrix tmp, int p, int q, int n) {
+  int i = 0, j = 0;
+  for (int row = 0; row < n; row++) {
+    for (int col = 0; col < n; col++) {
+      if (row != p && col != q) {
+        tmp->mat[i][j++] = m->mat[row][col];
+        if (j == n - 1) {
+          j = 0;
+          i++;
+        }
+      }
+    }
+  }
+}
+
+double detOfMatrix(matrix m, int n) {
+    double D = 0;
+    if (n == 1) {
+      return m->mat[0][0];
+    }
+    int sign = 1;
+    matrix tmp = initMatrix(m->row, m->col);
+    for (int f = 0; f < n; f++) {
+      getCofactor(m, tmp, 0, f, n);
+      D += sign * m->mat[0][f] * detOfMatrix(tmp, n-1);
+      sign = -sign;
+    }
+    return D;
 }
 
 // returns the determinant of given matrix
 double det(matrix m) {
-    // TODO
-    return 0;
+    if (m == NULL | m->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+    int n = m->col;
+    double D = detOfMatrix(m, n);
+    return D;
 }
 
-// returns inverse matrix if invertible 
+// returns inverse matrix if invertible
 matrix inv(matrix m) {
     // TODO
     return NULL;
@@ -453,7 +488,7 @@ matrix rref(matrix m) {
 					srow = k;
 				}
 				k++;
-			} 
+			}
 			// move to next column if all zero
 			if (srow == -1) {
 				j++;
