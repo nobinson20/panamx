@@ -398,15 +398,15 @@ let translate (globals, functions, structs) =
       | SCall ("matrixWidth", [e]) ->
         L.build_call matrix_width_func [| expr builder e |] "matrix_width" builder
 
-      | SCall ("matrixSum", [e]) ->
+      | SCall ("sum", [e]) ->
         L.build_call matrix_sum_func [| expr builder e |] "matrix_sum" builder
-      | SCall ("matrixMean", [e]) ->
+      | SCall ("mean", [e]) ->
         L.build_call matrix_mean_func [| expr builder e |] "matrix_mean" builder
-      | SCall ("matrixTrans", [e]) ->
+      | SCall ("trans", [e]) ->
         L.build_call matrix_trans_func [| expr builder e |] "matrix_trans" builder
-      | SCall ("matrixReduce", [e]) ->
+      | SCall ("rref", [e]) ->
         L.build_call matrix_rref_func [| expr builder e |] "matrix_rref" builder
-      | SCall ("matrixRank", [e]) ->
+      | SCall ("rank", [e]) ->
         L.build_call matrix_rank_func [| expr builder e |] "matrix_rank" builder
 
       | SCall (f, args) ->

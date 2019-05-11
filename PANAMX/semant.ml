@@ -39,19 +39,19 @@ let check (globals, functions, structs) =
       formals = arg_list;
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty 
-      [ ("print", [(Int, "x")], Void);
+      [ ("print",  [(Int, "x")], Void);
         ("printb", [(Bool, "x")], Void);
         ("prints", [(String, "x")], Void);
         ("printf", [(Float, "x")], Void);
         ("printm", [(Matrix, "x")], Void);
-        ("free", [(Matrix, "x")], Void);
+        ("free",   [(Matrix, "x")], Void);
         ("matrixHeight", [(Matrix, "x")], Int);
-        ("matrixWidth", [(Matrix, "x")], Int);
-        ("matrixSum", [(Matrix, "x")], Float);
-        ("matrixMean", [(Matrix, "x")], Float); 
-        ("matrixTrans", [(Matrix, "x")], Matrix); 
-        ("matrixReduce", [(Matrix, "x")], Matrix); 
-        ("matrixRank", [(Matrix, "x")], Float) ]
+        ("matrixWidth",  [(Matrix, "x")], Int);
+        ("sum",    [(Matrix, "x")], Float);
+        ("mean",   [(Matrix, "x")], Float); 
+        ("trans",  [(Matrix, "x")], Matrix); 
+        ("rref",   [(Matrix, "x")], Matrix); 
+        ("rank",   [(Matrix, "x")], Float) ]
   in
 
   (* Add function name to symbol table *)

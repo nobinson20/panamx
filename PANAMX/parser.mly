@@ -9,7 +9,7 @@ open Ast
 %token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 /* Should we have the matrix built-in function tokens on their own line  */
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR DOT STRUCT
-%token HEIGHT WIDTH MATSUM MATMEAN MATTRANS MATRREF MATRANK
+%token HEIGHT WIDTH 
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID MATRIX
 %token <int> LITERAL
 %token <bool> BLIT
@@ -133,11 +133,6 @@ expr:
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
   | ID HEIGHT        { Call("matrixHeight", [Id($1)]) }
   | ID WIDTH         { Call("matrixWidth",  [Id($1)]) }
-  | ID MATSUM        { Call("matrixSum",    [Id($1)]) }
-  | ID MATMEAN       { Call("matrixMean",   [Id($1)]) }
-  | ID MATTRANS      { Call("matrixTrans",  [Id($1)]) }
-  | ID MATRREF       { Call("matrixReduce", [Id($1)]) }
-  | ID MATRANK       { Call("matrixRank",   [Id($1)]) }
   | LT STRUCT ID GT  { StructLit($3)          }
   | ID DOT ID        { Member($1, $3)         }
   | ID DOT ID ASSIGN expr { MemAssign($1, $3, $5) }
