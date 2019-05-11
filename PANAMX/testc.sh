@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Add customized test file here
-files="tests/test-matrix5.mc"
+files="tests/test-matrix6.mc"
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
