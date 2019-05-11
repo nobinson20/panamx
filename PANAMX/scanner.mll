@@ -23,6 +23,8 @@ rule token = parse
 | '*'      { TIMES }
 | '/'      { DIVIDE }
 | '%'      { MODULO }
+| ".*"     { MMUL }
+| "./"     { MDIV }
 | "++"     { INCREMENT }
 | "--"     { DECREMENT }
 | '='      { ASSIGN }

@@ -138,6 +138,11 @@ let translate (globals, functions, structs) =
   let mul_mm_func : L.llvalue =
       L.declare_function "mulMatrixMatrix" mul_mm_t the_module in
 
+  let mul_ew_mm_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; matrix_t; i32_t |] in
+  let mul_ew_mm_func : L.llvalue =
+      L.declare_function "mulElementWiseMatrix" mul_ew_mm_t the_module in
+
   let matrix_sum_t : L.lltype =
       L.function_type float_t [| matrix_t |] in
   let matrix_sum_func : L.llvalue =
@@ -294,6 +299,7 @@ let translate (globals, functions, structs) =
           | A.Leq     -> L.build_icmp L.Icmp.Sle
           | A.Greater -> L.build_icmp L.Icmp.Sgt
           | A.Geq     -> L.build_icmp L.Icmp.Sge
+          | _         -> raise (Failure "should not happen")
           ) e1' e2' "tmp" builder
       | SBinop (((ty1, _) as e1), op, ((ty2, _) as e2)) when ty1 = A.Bool && ty2 = A.Bool ->
         let e1' = expr builder e1
@@ -331,6 +337,10 @@ let translate (globals, functions, structs) =
               if ty1 = A.Matrix && ty2 != A.Matrix
               then L.build_call mul_md_func [| e1'; e2'; L.const_int i32_t 1 |] "div_matrix" builder
               else raise (Failure "illegal operation / on matrix")
+          | A.Mmul when ty1 = ty2 && ty1 = A.Matrix ->
+              L.build_call mul_ew_mm_func [| e1'; e2'; L.const_int i32_t 0 |] "elewise_matrix" builder
+          | A.Mdiv when ty1 = ty2 && ty1 = A.Matrix ->
+              L.build_call mul_ew_mm_func [| e1'; e2'; L.const_int i32_t 1 |] "elewise_matrix" builder
           | _      -> raise (Failure 
               ("illegal operation " ^ (A.string_of_op op) ^ " on matrix"))
           )
@@ -351,6 +361,7 @@ let translate (globals, functions, structs) =
           | A.Geq     -> L.build_fcmp L.Fcmp.Oge
           | A.And | A.Or ->
               raise (Failure "internal error: semant should have rejected and/or on float")
+          | _         -> raise (Failure "should not happen")
           ) e1' e2' "tmp" builder
       | SUnop(op, ((t, ex) as e)) ->
           let e' = expr builder e in

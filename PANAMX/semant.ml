@@ -157,6 +157,7 @@ let check (globals, functions, structs) =
             Add | Sub | Mult | Div | Mod when same && t1 = Int -> Int
           | Add | Sub | Mult | Div | Mod when is_float -> Float
           | Add | Sub | Mult | Div when t1 = Matrix || t2 = Matrix -> Matrix
+          | Mmul | Mdiv when t1 = Matrix && t2 = Matrix -> Matrix
           | Equal | Neq when same -> Bool
           | Less | Leq | Greater | Geq when same && (t1 = Int || t1 = Float) -> Bool
           | And | Or when same && t1 = Bool -> Bool

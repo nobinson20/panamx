@@ -189,6 +189,30 @@ matrix mulMatrixMatrix(matrix m, matrix n) {
 	return result;
 }
 
+matrix mulElementWiseMatrix(matrix m, matrix n, int div) {
+	if (m == NULL || m->mat == NULL || n == NULL || n->mat == NULL) {
+        perror("Empty Matrix");
+        exit(1);
+    }
+	if (m->row != n->row || m->col != n->col) {
+		perror("Error in element wise operation: dimension mismatched");
+        exit(1);
+	}
+	int h = m->row, w = m->col;
+	matrix result = initMatrix(h, w);
+	if (div) {
+		for (int i = 0; i < h; i++) 
+			for (int j = 0; j < w; j++) 
+				result->mat[i][j] = m->mat[i][j] / n->mat[i][j];
+	}
+	else {
+		for (int i = 0; i < h; i++) 
+			for (int j = 0; j < w; j++) 
+				result->mat[i][j] = m->mat[i][j] * n->mat[i][j];
+	}
+	return result;
+}
+
 // helper function for rref() function, swaps rows of given matrix by reference
 static void swap(matrix m, int a, int b) {
 	double temp;

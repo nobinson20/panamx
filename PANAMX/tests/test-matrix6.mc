@@ -12,5 +12,9 @@ int main() {
     printm(q);
     q = n - m;
     printm(q);
+    q = m .* n;
+    printm(q);
+    q = n ./ m;
+    printm(q);
     return 0;
 }

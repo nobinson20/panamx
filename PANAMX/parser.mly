@@ -9,7 +9,7 @@ open Ast
 %token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 /* Should we have the matrix built-in function tokens on their own line  */
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR DOT STRUCT
-%token HEIGHT WIDTH 
+%token HEIGHT WIDTH MMUL MDIV
 %token RETURN IF ELSE FOR WHILE INT BOOL STRING FLOAT VOID MATRIX
 %token <int> LITERAL
 %token <bool> BLIT
@@ -27,7 +27,7 @@ open Ast
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
-%left TIMES DIVIDE MODULO
+%left TIMES DIVIDE MODULO MMUL MDIV
 %left INCREMENT DECREMENT
 %right NOT
 
@@ -120,6 +120,8 @@ expr:
   | expr GEQ    expr { Binop($1, Geq,   $3)   }
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
+  | expr MMUL   expr { Binop($1, Mmul,  $3)   }
+  | expr MDIV   expr { Binop($1, Mdiv,  $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
   | ID ASSIGN expr   { Assign($1, $3)         }
