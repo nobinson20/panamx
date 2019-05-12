@@ -93,6 +93,11 @@ let translate (globals, functions, structs) =
   let matrix_assign_funct : L.llvalue =
       L.declare_function "matrixAssign" matrix_assign_t the_module in
 
+  let matrix_slice_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; i32_t; i32_t; i32_t; i32_t |] in
+  let matrix_slice_func : L.llvalue =
+      L.declare_function "matrixSlice" matrix_slice_t the_module in
+
   let print_matrix_t : L.lltype =
       L.function_type i32_t [| matrix_t |] in
   let print_matrix_func : L.llvalue =
@@ -277,6 +282,14 @@ let translate (globals, functions, structs) =
         and e' = int_to_float builder e
         and s' = L.build_load (lookup s) s builder in
         L.build_call matrix_assign_funct [| s'; i'; j'; e' |] "matrix_assign" builder
+
+      | SMatSlice (s, i, j, k, l) ->
+        let i' = expr builder i
+        and j' = expr builder j
+        and k' = expr builder k
+        and l' = expr builder l
+        and s' = L.build_load (lookup s) s builder in
+        L.build_call matrix_slice_func [| s'; i'; j'; k'; l' |] "matrix_slice" builder
 
       | SStructLit id ->
         let (sty, _) = StringMap.find id struct_decls

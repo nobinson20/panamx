@@ -18,4 +18,5 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 7. matrix op (+, -, *, /)
 8. struct define & declaration & initialization
 9. struct member access & assign (only for int / double / bool, not for pointer & matrix)
-10. matrix determinant
+10. matrix determinant, inverse
+11. matrix slicing m[1:2][2:3]

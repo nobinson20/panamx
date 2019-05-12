@@ -5,7 +5,7 @@ open Ast
 %}
 
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
+%token SEMI COLON LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE MODULO ASSIGN INCREMENT DECREMENT
 /* Should we have the matrix built-in function tokens on their own line  */
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR DOT STRUCT
@@ -69,7 +69,7 @@ typ:
 
 sdecl:
     STRUCT ID LBRACE sbody_list RBRACE SEMI { {
-      sname = $2; 
+      sname = $2;
       svar = $4 } }
 
 sbody_list:
@@ -133,6 +133,7 @@ expr:
   | LT expr COMMA expr GT { MatLitEmpty($2, $4) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { MatIndex($1, $3, $6) }
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { MatAssign($1, $3, $6, $9) }
+  | ID LBRACKET expr COLON expr RBRACKET LBRACKET expr COLON expr RBRACKET { MatSlice($1, $3, $5, $8, $10) }
   | ID HEIGHT        { Call("matrixHeight", [Id($1)]) }
   | ID WIDTH         { Call("matrixWidth",  [Id($1)]) }
   | LT STRUCT ID GT  { StructLit($3)          }

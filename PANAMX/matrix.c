@@ -47,6 +47,18 @@ double matrixAccess(matrix m, int row, int col) {
   return m->mat[row][col];
 }
 
+matrix matrixSlice(matrix m, int s1, int e1, int s2, int e2) {
+  int row = e1 - s1;
+  int col = e2 - s2;
+  matrix tmp = initMatrix(row, col);
+  for (int i = s1, k = 0; i < e1; i++, k++) {
+    for (int j = s2, l = 0; j < e2; j++, l++) {
+      tmp->mat[k][l] = m->mat[i][j];
+    }
+  }
+  return tmp;
+}
+
 double matrixAssign(matrix m, int i, int j, double val) {
   if (m->row <= i || m->col <= j) {
     perror("Matrix Index Out of Bounds");
@@ -530,7 +542,6 @@ matrix inv(matrix m) {
   }
   return inv;
 }
-
 
 // returns matrix in reduced row echelon form
 matrix rref(matrix m) {

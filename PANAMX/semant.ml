@@ -208,6 +208,8 @@ let check (globals, functions, structs) =
               SMatIndex(_, (ti, ei), (tj, ej)) -> (Float, SMatAssign(id, (ti, ei), (tj, ej), (tr, er)))
             | _ -> raise (Failure ("should not happen - matrix")))
 
+      | MatSlice(id, i, j, k, l) -> check_matrix_slice id i j k l
+
       | StructLit id -> ignore(find_struct id); (Struct(id), SStructLit(id))
 
       | Member (s, m) ->
@@ -227,6 +229,14 @@ let check (globals, functions, structs) =
         and (tj, ej) = expr j in
         if ti != Int || tj != Int then raise (Failure ("index must be integer"))
         else (Float, SMatIndex(id, (ti, ei), (tj, ej)))
+
+    and check_matrix_slice (id: string) (i: expr) (j: expr) (k: expr) (l: expr) =
+        let (ti, ei) = expr i
+        and (tj, ej) = expr j
+        and (tk, ek) = expr k
+        and (tl, el) = expr l in
+        if ti != Int || tj != Int || tk != Int || tl != Int then raise (Failure ("index must be integer"))
+        else (Matrix, SMatSlice(id, (ti, ei), (tj, ej), (tk, ek), (tl, el)))
 
     in
 
