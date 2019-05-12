@@ -1,0 +1,8 @@
+int main() {
+    matrix m;
+    m = [1, 2, -1, -4;
+         2, 3, -1, -11;
+         -2, 0, -3, 22];
+    printm(rref(m));
+    return 0;
+}

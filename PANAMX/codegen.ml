@@ -166,7 +166,7 @@ let translate (globals, functions, structs) =
   let matrix_rref_t : L.lltype =
       L.function_type matrix_t [| matrix_t |] in
   let matrix_rref_func : L.llvalue =
-      L.declare_function "rref" matrix_rref_t the_module in
+      L.declare_function "rrref" matrix_rref_t the_module in
 
   let matrix_rank_t : L.lltype =
       L.function_type float_t [| matrix_t |] in

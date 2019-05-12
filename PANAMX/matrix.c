@@ -48,8 +48,20 @@ double matrixAccess(matrix m, int row, int col) {
 }
 
 matrix matrixSlice(matrix m, int s1, int e1, int s2, int e2) {
+  if (m == NULL || m->mat == NULL) {
+    perror("Empty Matrix");
+    exit(1);
+  }
+  if (m->row <= e1 || m->col <= e2) {
+    perror("matrix index out of bound");
+    exit(1);
+  }
   int row = e1 - s1;
   int col = e2 - s2;
+  if (row <= 0 || col <= 0) {
+    perror("Empty Matrix");
+    exit(1);
+  }
   matrix tmp = initMatrix(row, col);
   for (int i = s1, k = 0; i < e1; i++, k++) {
     for (int j = s2, l = 0; j < e2; j++, l++) {
@@ -627,4 +639,67 @@ double rank(matrix m) {
     }
   }
   return rnk;
+}
+
+
+// Working RREF implementation
+void mulandaddRows(matrix m, int dest, int src, double mplr)
+{
+  double *drow, *srow;
+  drow = m->mat[dest];
+  srow = m->mat[src];
+  for (int i = 0; i < m->col; i++)
+  drow[i] += mplr * srow[i];
+}
+
+void swapRows( matrix m, int a, int b) {
+  double *r1, *r2, temp;
+  if (a == b) return;
+  r1 = m->mat[a];
+  r2 = m->mat[b];
+  for (int i = 0; i < m->col; i++) {
+    temp = r1[i];
+    r1[i] = r2[i];
+    r2[i] = temp;
+  }
+}
+
+void normalizeRow( matrix m, int row, int lead)
+{
+  double *drow = m->mat[row];
+  double lv = drow[lead];
+  for (int i = 0; i < m->col; i++)
+  drow[i] /= lv;
+}
+
+// returns rref of given matrix m
+matrix rrref(matrix m) {
+  int i;
+  double lv;
+  int rowCount = m->row;
+  int lead = 0;
+  for (int r = 0; r < rowCount; r++) {
+    if (lead >= m->col)
+    break;
+    i = r;
+    while (0 == m->mat[i][lead]) {
+      i++;
+      if (i == rowCount) {
+        i = r;
+        lead++;
+        if (lead == m->col)
+        break;
+      }
+    }
+    swapRows(m, i, r);
+    normalizeRow(m, r, lead );
+    for (i = 0; i < rowCount; i++) {
+      if (i != r) {
+        lv = m->mat[i][lead];
+        mulandaddRows(m, i, r, -lv) ;
+      }
+    }
+    lead++;
+  }
+  return m;
 }

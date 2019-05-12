@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Add customized test file here
-files="tests2/px_tests/test-matrixSlice.px"
+files="tests2/px_tests/test-matrixRREF.px"
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
