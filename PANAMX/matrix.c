@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 typedef struct Matrix {
   int row;
@@ -647,8 +648,14 @@ void normalizeRow(matrix m, int row, int lead)
 {
   double *drow = m->mat[row];
   double lv = drow[lead];
+  if (fabs(lv) <= 0.00001) {
+    if (lv < 0)
+      lv = -0.00001;
+    else
+      lv = 0.00001;
+  }
   for (int i = 0; i < m->col; i++)
-  drow[i] /= lv;
+    drow[i] /= lv;
 }
 
 // returns rref of given matrix m
@@ -661,7 +668,7 @@ matrix rrref(matrix m) {
     if (lead >= m->col)
     break;
     i = r;
-    while (0 == m->mat[i][lead]) {
+    while (fabs(m->mat[i][lead]) <= 0.00001) {
       i++;
       if (i == rowCount) {
         i = r;
