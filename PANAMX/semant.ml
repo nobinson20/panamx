@@ -52,7 +52,8 @@ let check (globals, functions, structs) =
         ("trans",  [(Matrix, "x")], Matrix);
         ("rref",   [(Matrix, "x")], Matrix);
         ("rank",   [(Matrix, "x")], Float);
-        ("det",    [(Matrix, "x")], Float);]
+        ("det",    [(Matrix, "x")], Float);
+        ("inv",    [(Matrix, "x")], Matrix);]
   in
 
   (* Add function name to symbol table *)
