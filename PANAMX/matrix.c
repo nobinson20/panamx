@@ -98,6 +98,7 @@ void printMatrix(matrix m) {
 }
 
 void freeMatrix(matrix m) {
+  free(m->mat);
   free(m);
 }
 

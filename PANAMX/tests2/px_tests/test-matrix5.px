@@ -8,5 +8,7 @@ int main() {
          23.4, 21.8, 9.5,  10.7];
     m = m * n;
     printm(m);
+    free(m);
+    free(n);
     return 0;
 }
