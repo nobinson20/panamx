@@ -406,10 +406,39 @@ matrix trans(matrix m) {
   }
 }
 
+// returns nxn identity matrix given n
+matrix iden(int n) {
+  matrix empty = buildMatrixEmpty(n, n);
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      if (i == j) {
+        empty->mat[i][j] = 1;
+      }
+    }
+  }
+  return empty;
+}
+
 // returns an "array" (e.g., 1 x N matrix) of eigenvalues for given matrix
 matrix eig(matrix m) {
-  // TODO
-  return NULL;
+  if (m == NULL | m->mat == NULL) {
+    perror("Empty Matrix");
+    exit(1);
+  }
+  else if (m->row != m->col) {
+    perror("Cannot find eigenvalues of non-square matrices.");
+    exit(1);
+  }
+  double lambda;
+  int n = m->row;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      if (i == j) {
+        m->mat[i][j] = m->mat[i][j] - lambda;
+      }
+    }
+  }
+  return m;
 }
 
 void getCofactor(matrix m, matrix tmp, int p, int q, int n) {
@@ -501,6 +530,7 @@ matrix inv(matrix m) {
   }
   return inv;
 }
+
 
 // returns matrix in reduced row echelon form
 matrix rref(matrix m) {

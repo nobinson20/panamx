@@ -176,7 +176,7 @@ let translate (globals, functions, structs) =
   let matrix_inv_t : L.lltype =
       L.function_type matrix_t [| matrix_t |] in
   let matrix_inv_func : L.llvalue =
-      L.declare_function "inv" matrix_inv_t the_module in
+    L.declare_function "inv" matrix_inv_t the_module in
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)

@@ -26,7 +26,7 @@ panamx.native :
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff matrix.o
+	rm -rf testall.log ocamlllvm *.diff matrix.o *.ll *.out *.exe *.s
 
 # Testing the "printbig" example
 
