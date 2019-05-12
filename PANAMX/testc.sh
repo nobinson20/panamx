@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # Add customized test file here
+<<<<<<< HEAD
 files="tests2/px_tests/test-tmp1.px"
+=======
+files="tests2/px_tests/test-matrixTEST.px"
+>>>>>>> d3427640d6331cae1ef4d655ef8a95c32541ae4a
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
