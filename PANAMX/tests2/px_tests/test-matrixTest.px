@@ -6,5 +6,8 @@ int main() {
     printf(sum(m));
     printf(mean(m));
     printm(trans(m));
+    printm(m);
+    printm(rref(m));
+    printf(rank(m));
     return 0;
 }

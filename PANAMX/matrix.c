@@ -621,26 +621,6 @@ matrix rref(matrix m) {
   return new;
 }
 
-// returns rank of a given matrix
-double rank(matrix m) {
-  // get the reduced row echelon form of given matrix
-  matrix new = rref(m);
-  double rnk = 0;
-  // count the number of non-zero rows
-  for (int i = 0; i < new->row; i++) {
-    int zero = 1;
-    for (int j = 0; j < new->col; j++) {
-      if (new->mat[i][j] != 0) {
-        zero = 0;
-      }
-    }
-    if (zero == 0) {
-      rnk++;
-    }
-  }
-  return rnk;
-}
-
 
 // Working RREF implementation
 void mulandaddRows(matrix m, int dest, int src, double mplr)
@@ -652,7 +632,7 @@ void mulandaddRows(matrix m, int dest, int src, double mplr)
   drow[i] += mplr * srow[i];
 }
 
-void swapRows( matrix m, int a, int b) {
+void swapRows(matrix m, int a, int b) {
   double *r1, *r2, temp;
   if (a == b) return;
   r1 = m->mat[a];
@@ -664,7 +644,7 @@ void swapRows( matrix m, int a, int b) {
   }
 }
 
-void normalizeRow( matrix m, int row, int lead)
+void normalizeRow(matrix m, int row, int lead)
 {
   double *drow = m->mat[row];
   double lv = drow[lead];
@@ -702,4 +682,24 @@ matrix rrref(matrix m) {
     lead++;
   }
   return m;
+}
+
+
+// returns rank of a given matrix
+double rank(matrix m) {
+  // get the reduced row echelon form of given matrix
+  matrix new = rrref(m);
+  double rnk = 0;
+  // count the number of non-zero rows
+  for (int i = 0; i < new->row; i++) {
+    int zero = 0;
+    for (int j = 0; j < new->col; j++) {
+      if (new->mat[i][j] != 0) {
+        zero = 1;
+        break;
+      }
+    }
+    rnk += zero;
+  }
+  return rnk;
 }
