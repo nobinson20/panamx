@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// Note: matrix is a pointer type
 typedef struct Matrix {
   int row;
   int col;
@@ -52,14 +51,14 @@ matrix matrixSlice(matrix m, int s1, int e1, int s2, int e2) {
     perror("Empty Matrix");
     exit(1);
   }
-  if (m->row <= e1 || m->col <= e2) {
+  if (m->row < e1 || m->col < e2) {
     perror("matrix index out of bound");
     exit(1);
   }
   int row = e1 - s1;
   int col = e2 - s2;
   if (row <= 0 || col <= 0) {
-    perror("Empty Matrix");
+    perror("Matrix dimensions should be greater than zero");
     exit(1);
   }
   matrix tmp = initMatrix(row, col);

@@ -95,7 +95,8 @@ let rec string_of_expr = function
   | MatLitEmpty _ -> "matrix"
   | MatIndex (s, i, j) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]"
   | MatAssign (s, i, j, e) -> s ^ "[" ^ (string_of_expr i) ^ "][" ^ (string_of_expr j) ^ "]= " ^ (string_of_expr e)
-  | MatSlice (s, i, j, k, l) -> s ^ "[" ^ (string_of_expr i) ^ ":" ^ (string_of_expr j) ^ "][" ^ (string_of_expr k) ^ ":" ^ (string_of_expr l) ^ "]"
+  | MatSlice (s, i, j, k, l) -> s ^ "[" ^ (string_of_expr i) ^ ":" ^ (string_of_expr j) ^ "][" ^ 
+    (string_of_expr k) ^ ":" ^ (string_of_expr l) ^ "]"
   | StructLit e -> "new struct " ^ e ^ " ()"
   | Member (s, e) -> s ^ "." ^ e
   | MemAssign (s, m, e) -> s ^ "." ^ m ^ " = " ^ (string_of_expr e)

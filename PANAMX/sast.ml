@@ -67,7 +67,8 @@ let rec string_of_sexpr (t, e) =
   | SMatLitEmpty _ -> "matrix"
   | SMatIndex (s, i, j) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]"
   | SMatAssign (s, i, j, e) -> s ^ "[" ^ (string_of_sexpr i) ^ "][" ^ (string_of_sexpr j) ^ "]= " ^ (string_of_sexpr e)
-  | SMatSlice (s, i, j, k, l) -> s ^ "[" ^ (string_of_sexpr i) ^ ":" ^ (string_of_sexpr j) ^ "][" ^ (string_of_sexpr k) ^ ":" ^ (string_of_sexpr l) ^ "]"
+  | SMatSlice (s, i, j, k, l) -> s ^ "[" ^ (string_of_sexpr i) ^ ":" ^ (string_of_sexpr j) ^ "][" ^ 
+    (string_of_sexpr k) ^ ":" ^ (string_of_sexpr l) ^ "]"
   | SStructLit e -> "new struct " ^ e ^ " ()"
   | SMember (s, e) -> s ^ "." ^ e
   | SMemAssign (s, m, e) -> s ^ "." ^ m ^ " = " ^ (string_of_sexpr e)
