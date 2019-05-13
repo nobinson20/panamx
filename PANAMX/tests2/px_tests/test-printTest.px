@@ -1,0 +1,20 @@
+int main()
+{
+  int i;
+  bool b;
+  double a;
+  string s;
+  matrix m;
+  i = 10;
+  b = false;
+  a = 11.0;
+  s = "Hello World";
+  m = [1,2;
+       3,4];
+  print(i);
+  printb(b);
+  printf(a);
+  prints(s);
+  printm(m);
+  return 0;
+}

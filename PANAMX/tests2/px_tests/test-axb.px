@@ -1,0 +1,76 @@
+matrix solve(matrix A, matrix b) {
+    return inv(A) * b;
+}
+
+matrix combineTopDown(matrix a, matrix b) {
+    int i;
+    int j;
+    int arow;
+    int acol;
+    int brow;
+    int bcol;
+    matrix new;
+
+    arow = matrixHeight(a);
+    acol = matrixWidth(a);
+    brow = matrixHeight(b);
+    bcol = matrixWidth(b);
+
+    if (acol != bcol) {
+        prints("Cannot combine matrices with different widths");
+        return a;
+    }
+
+    new = <arow+brow, acol>;
+    for (i = 0; i < arow; i++) {
+        for (j = 0; j < acol; j++) {
+            new[i][j] = a[i][j];
+        }
+    }
+    for (i = arow; i < arow+brow; i++) {
+        for (j = 0; j < bcol; j++) {
+            new[i][j] = b[i-arow][j];
+        }
+    }
+    return new;
+}
+
+int main() {
+  /*  matrix A;
+    matrix b;
+    matrix x;
+    A = [1, 1, 1;
+         0, 2, 5;
+         2, 5, -1];
+    b = [6;
+         -4;
+         27]; */
+
+    matrix e1;
+    matrix e2;
+    matrix e3;
+    matrix comb;
+    matrix A;
+    matrix b;
+    matrix x;
+
+    // Equations
+    e1 = [1, 1, 1, 6];
+    e2 = [0, 2, 5, -4];
+    e3 = [2, 5, -1, 27];
+
+    // Combine into 3 X 4 matrix
+    comb = combineTopDown(e1, e2);
+    comb = combineTopDown(comb, e3);
+
+    // Slice matrix
+    A = comb[0:3][0:3];
+    b = comb[0:3][3:4];
+    x = solve(A, b);
+
+    printm(A);
+    printm(b);
+    printm(x);
+
+    return 0;
+}

@@ -1,0 +1,15 @@
+
+struct Node {
+  struct Node next;
+  int val;
+};
+
+int main() {
+    struct Node p;
+    struct Node q;
+    p = <struct Node>;
+    q = <struct Node>;
+    p.val = 12;
+    q.val = 23;
+    return 0;
+}
