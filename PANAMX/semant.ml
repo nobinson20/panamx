@@ -53,7 +53,8 @@ let check (globals, functions, structs) =
         ("rref",   [(Matrix, "x")], Matrix);
         ("rank",   [(Matrix, "x")], Float);
         ("det",    [(Matrix, "x")], Float);
-        ("inv",    [(Matrix, "x")], Matrix)]
+        ("inv",    [(Matrix, "x")], Matrix);
+        ("sqrt",  [(Float, "x")], Float)]
   in
 
   (* Add function name to symbol table *)

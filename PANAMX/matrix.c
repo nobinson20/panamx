@@ -712,3 +712,8 @@ double rank(matrix m) {
   }
   return rnk;
 }
+
+// Calculate square root of double
+double sqrtd(double x) {
+  return sqrt(x);
+}

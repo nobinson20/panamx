@@ -183,6 +183,11 @@ let translate (globals, functions, structs) =
   let matrix_inv_func : L.llvalue =
     L.declare_function "inv" matrix_inv_t the_module in
 
+  let float_sqrt_t : L.lltype =
+      L.function_type float_t [| float_t |] in
+  let float_sqrt_func : L.llvalue =
+      L.declare_function "sqrtd" float_sqrt_t the_module in
+
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -459,6 +464,10 @@ let translate (globals, functions, structs) =
         L.build_call matrix_det_func [| expr builder e |] "matrix_det" builder
       | SCall ("inv", [e]) ->
         L.build_call matrix_inv_func [| expr builder e |] "matrix_inv" builder
+
+      | SCall ("sqrt", [e]) ->
+        L.build_call float_sqrt_func [| expr builder e |] "float_sqrt" builder
+
 
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
