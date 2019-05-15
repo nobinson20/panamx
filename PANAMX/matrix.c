@@ -448,24 +448,7 @@ matrix iden(int n) {
 
 // returns an "array" (e.g., 1 x N matrix) of eigenvalues for given matrix
 matrix eig(matrix m) {
-  if (m == NULL | m->mat == NULL) {
-    perror("Empty Matrix");
-    exit(1);
-  }
-  else if (m->row != m->col) {
-    perror("Cannot find eigenvalues of non-square matrices.");
-    exit(1);
-  }
-  double lambda;
-  int n = m->row;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      if (i == j) {
-        m->mat[i][j] = m->mat[i][j] - lambda;
-      }
-    }
-  }
-  return m;
+  return 0;
 }
 
 void getCofactor(matrix m, matrix tmp, int p, int q, int n) {
@@ -513,27 +496,19 @@ double det(matrix m) {
   return D;
 }
 
-// Function to get adjoint of A[N][N] in adj[N][N].
+// Function to get adjoint
 void adjoint(matrix a, matrix adj) {
   if (a->row == 1) {
     adj->mat[0][0] = 1;
     return;
   }
-  // temp is used to store cofactors of A[][]
   int sign = 1;
   matrix tmp = initMatrix(a->row, a->col);
   int n = a->row;
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      // Get cofactor of A[i][j]
       getCofactor(a, tmp, i, j, n);
-
-      // sign of adj[j][i] positive if sum of row
-      // and column indexes is even.
       sign = ((i+j)%2==0)? 1: -1;
-
-      // Interchanging rows and columns to get the
-      // transpose of the cofactor matrix
       adj->mat[j][i] = (sign)*(detOfMatrix(tmp, n-1));
     }
   }
@@ -548,7 +523,6 @@ matrix inv(matrix m) {
   }
   matrix adj = initMatrix(m->row, m->col);
   adjoint(m, adj);
-
   matrix inv = initMatrix(m->row, m->col);
   for (int i = 0; i < inv->row; i++) {
     for (int j = 0; j < inv->col; j++) {
@@ -558,74 +532,7 @@ matrix inv(matrix m) {
   return inv;
 }
 
-// returns matrix in reduced row echelon form
-matrix rref(matrix m) {
-  if (m == NULL | m->mat == NULL) {
-    perror("Empty Matrix");
-    exit(1);
-  }
-  // create new matrix with all entries initialized to zero
-  matrix new = buildMatrixEmpty(m->col, m->row);
-  // iterate through all entries to initialize correct values
-  for (int i = 0; i < new->row; i++) {
-    for (int j = 0; j < new->col; j++) {
-      // transpose each value
-      new->mat[i][j] = m->mat[i][j];
-    }
-  }
-  int i = 0;
-  int j = 0;
-  while (i < new->row && j < new->col) {
-    int srow;
-    // if the entry new[i][j] is zero, iterate through the column to find a non-zero value
-    if (new->mat[i][j] == 0) {
-      srow = -1;
-      int k = i + 1;
-      while (k < new->row && srow == -1)
-      {
-        if (new->mat[k][j] != 0) {
-          srow = k;
-        }
-        k++;
-      }
-      // move to next column if all zero
-      if (srow == -1) {
-        j++;
-      }
-      // ... and swap the row containing that non-zero value
-      else {
-        swap(new, i, srow);
-        divideRow(new, i, new->mat[i][j]);
-        k = i + 1;
-        while (k < new->row) {
-          if (new->mat[k][j] != 0) {
-            subtractRow(new, k, i, new->mat[k][j]);
-          }
-          k++;
-        }
-        j++;
-        i++;
-      }
-    }
-    // entry new[i][j] is non-zero, normalize
-    else {
-      divideRow(new, i, new->mat[i][j]);
-      int k = i + 1;
-      while(k < new->row) {
-        if(new->mat[k][j] != 0) {
-          subtractRow(new, k, i, new->mat[k][j]);
-        }
-        k++;
-      }
-      j++;
-      i++;
-    }
-  }
-  return new;
-}
 
-
-// Working RREF implementation
 void mulandaddRows(matrix m, int dest, int src, double mplr)
 {
   double *drow, *srow;
@@ -662,7 +569,7 @@ void normalizeRow(matrix m, int row, int lead)
 }
 
 // returns rref of given matrix m
-matrix rrref(matrix m) {
+matrix rref(matrix m) {
   int i;
   double lv;
   int rowCount = m->row;
@@ -697,7 +604,7 @@ matrix rrref(matrix m) {
 // returns rank of a given matrix
 double rank(matrix m) {
   // get the reduced row echelon form of given matrix
-  matrix new = rrref(m);
+  matrix new = rref(m);
   double rnk = 0;
   // count the number of non-zero rows
   for (int i = 0; i < new->row; i++) {
