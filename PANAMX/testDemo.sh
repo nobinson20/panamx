@@ -5,7 +5,7 @@
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
 
-demos="tests2/demos/test-*.px"
+demos="tests/demos/test-*.px"
 
 # Change this line to set directories
 setdirs=$demos
