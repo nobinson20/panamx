@@ -9,14 +9,15 @@ Project files for PANAMX, a matrix manipulation language developed for COMS 4115
 
 **Features**
 
-1. print strings
+1. prints strings
 2. inc / dec
 3. double + int
 4. matrix by struct
 5. cast int to double in matrix
-6. get matrix height/width
+6. get matrix height/width, printm matrix
 7. matrix op (+, -, *, /)
 8. struct define & declaration & initialization
 9. struct member access & assign (only for int / double / bool, not for pointer & matrix)
-10. matrix sum, mean, trans, determinant, inverse, rref, rank
+10. matrix sum, mean, trans, det, inverse, rref, rank, concatTD, concatLF, .*, ./
 11. matrix slicing m[1:2][2:3]
+12: math functions sqrt, nroot, abs, power (for both int/double)
