@@ -183,6 +183,16 @@ let translate (globals, functions, structs) =
   let matrix_inv_func : L.llvalue =
     L.declare_function "inv" matrix_inv_t the_module in
 
+  let matrix_concatTB_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; matrix_t |] in
+  let matrix_concatTB_func : L.llvalue =
+    L.declare_function "concatTB" matrix_concatTB_t the_module in
+
+  let matrix_concatLR_t : L.lltype =
+      L.function_type matrix_t [| matrix_t; matrix_t |] in
+  let matrix_concatLR_func : L.llvalue =
+    L.declare_function "concatLR" matrix_concatLR_t the_module in
+
   let int_sqrti_t : L.lltype =
       L.function_type i32_t [| i32_t |] in
   let int_sqrti_func : L.llvalue =
@@ -500,22 +510,26 @@ let translate (globals, functions, structs) =
         L.build_call matrix_det_func [| expr builder e |] "matrix_det" builder
       | SCall ("inv", [e]) ->
         L.build_call matrix_inv_func [| expr builder e |] "matrix_inv" builder
+      | SCall ("concatTB", [e1; e2]) ->
+        L.build_call matrix_concatTB_func [| expr builder e1; expr builder e2 |] "matrix_concatTB" builder
+      | SCall ("concatLR", [e1; e2]) ->
+        L.build_call matrix_concatLR_func [| expr builder e1; expr builder e2 |] "matrix_concatLR" builder
 
       | SCall ("sqrti", [e]) ->
         L.build_call int_sqrti_func [| expr builder e |] "int_sqrti" builder
       | SCall ("sqrtd", [e]) ->
         L.build_call float_sqrtd_func [| expr builder e |] "float_sqrtd" builder
-      | SCall ("nrooti", [e1;e2]) ->
+      | SCall ("nrooti", [e1; e2]) ->
         L.build_call nrooti_func [| expr builder e1; expr builder e2 |] "nrooti" builder
-      | SCall ("nrootd", [e1;e2]) ->
+      | SCall ("nrootd", [e1; e2]) ->
         L.build_call nrootd_func [| expr builder e1; expr builder e2 |] "nrooti" builder
       | SCall ("absi", [e]) ->
         L.build_call absi_func [| expr builder e |] "absi" builder
       | SCall ("absd", [e]) ->
         L.build_call absd_func [| expr builder e|] "absd" builder
-      | SCall ("poweri", [e1;e2]) ->
+      | SCall ("poweri", [e1; e2]) ->
         L.build_call poweri_func [| expr builder e1; expr builder e2 |] "poweri" builder
-      | SCall ("powerd", [e1;e2]) ->
+      | SCall ("powerd", [e1; e2]) ->
         L.build_call powerd_func [| expr builder e1; expr builder e2 |] "powerd" builder
 
       | SCall (f, args) ->

@@ -1,70 +1,4 @@
-// perceptron
-matrix combineTopDown(matrix a, matrix b) {
-    int i;
-    int j;
-    int arow;
-    int acol;
-    int brow;
-    int bcol;
-    matrix new;
-
-    arow = matrixHeight(a);
-    acol = matrixWidth(a);
-    brow = matrixHeight(b);
-    bcol = matrixWidth(b);
-
-    if (acol != bcol) {
-        prints("Cannot combine matrices with different widths");
-        return a;
-    }
-
-    new = <arow+brow, acol>;
-    for (i = 0; i < arow; i++) {
-        for (j = 0; j < acol; j++) {
-            new[i][j] = a[i][j];
-        }
-    }
-    for (i = arow; i < arow+brow; i++) {
-        for (j = 0; j < bcol; j++) {
-            new[i][j] = b[i-arow][j];
-        }
-    }
-    return new;
-}
-
-matrix combineLeftRight(matrix a, matrix b) {
-    int i;
-    int j;
-    int arow;
-    int acol;
-    int brow;
-    int bcol;
-    matrix new;
-
-    arow = matrixHeight(a);
-    acol = matrixWidth(a);
-    brow = matrixHeight(b);
-    bcol = matrixWidth(b);
-
-    if (arow != brow) {
-        prints("Cannot combine matrices with different height");
-        return a;
-    }
-
-    new = <arow, acol+bcol>;
-    for (i = 0; i < arow; i++) {
-        for (j = 0; j < acol; j++) {
-            new[i][j] = a[i][j];
-        }
-    }
-    for (i = 0; i < brow; i++) {
-        for (j = acol; j < acol+bcol; j++) {
-            new[i][j] = b[i][j-acol];
-        }
-    }
-    return new;
-}
-
+// Perceptron Learning Algorithm
 int sign(double x) {
   if (x > 0.0) {
     return 1;
@@ -104,7 +38,7 @@ matrix perceptron(matrix df) {
   for (i = 0; i < n; i++) {
     ones[i][0] = 1;
   }
-  X = combineLeftRight(X, ones);
+  X = concatLR(X, ones);
   w = [0, 0, 0];
   output = [0, 0, 0];
 
@@ -123,7 +57,7 @@ matrix perceptron(matrix df) {
       diff = diff + absd(diffvec[0][i]);
     }
     iter = iter + 1;
-    output = combineTopDown(output, w);
+    output = concatTB(output, w);
   }
   n = matrixHeight(output);
   output = output[1:n][0:3];

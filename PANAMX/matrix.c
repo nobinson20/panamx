@@ -484,7 +484,7 @@ double detOfMatrix(matrix m, int n) {
 
 // returns the determinant of given matrix
 double det(matrix m) {
-  if (m == NULL | m->mat == NULL) {
+  if (m == NULL || m->mat == NULL) {
     perror("Empty Matrix");
     exit(1);
   }
@@ -622,8 +622,66 @@ double rank(matrix m) {
 }
 
 // concats top bot matrices
+matrix concatTB(matrix a, matrix b) {
+  int arow = a->row;
+  int acol = a->col;
+  int brow = b->row;
+  int bcol = b->col;
+  if (a == NULL || a->mat == NULL) {
+    return b;
+  }
+  else if (b == NULL || b->mat == NULL) {
+    return a;
+  }
+  else if (acol != bcol) {
+    perror("Cannot combine matrices with different widths");
+    exit(1);
+  }
+  else {
+    matrix new = initMatrix(arow+brow, acol);
+    for (int i = 0; i < arow; i++) {
+      for (int j = 0; j < acol; j++) {
+        new->mat[i][j] = a->mat[i][j];
+      }
+    }
+    for (int i = arow; i < arow+brow; i++) {
+      for (int j = 0; j < bcol; j++) {
+        new->mat[i][j] = b->mat[i-arow][j];
+      }
+    }
+    return new;
+  }
+}
 
 // concats left right matrices
+matrix concatLR(matrix a, matrix b) {
+  int arow = a->row;
+  int acol = a->col;
+  int brow = b->row;
+  int bcol = b->col;
+  if (a == NULL || a->mat == NULL) {
+    return b;
+  }
+  if (b == NULL || b->mat == NULL) {
+    return a;
+  }
+  if (arow != brow) {
+    perror("Cannot combine matrices with different heights");
+    exit(1);
+  }
+  matrix new = initMatrix(arow, acol+bcol);
+  for (int i = 0; i < arow; i++) {
+    for (int j = 0; j < acol; j++) {
+      new->mat[i][j] = a->mat[i][j];
+    }
+  }
+  for (int i = 0; i < brow; i++) {
+    for (int j = acol; j < acol+bcol; j++) {
+      new->mat[i][j] = b->mat[i][j-acol];
+    }
+  }
+  return new;
+}
 
 // Calculate square root of double
 double sqrtd(double num) {
