@@ -54,7 +54,16 @@ let check (globals, functions, structs) =
         ("rank",   [(Matrix, "x")], Float);
         ("det",    [(Matrix, "x")], Float);
         ("inv",    [(Matrix, "x")], Matrix);
-        ("sqrt",  [(Float, "x")], Float)]
+        ("sqrt",  [(Float, "x")], Float);
+        ("nrooti",  [(Int, "x"); (Int, "y")], Int);
+        ("nrootd",  [(Int, "x"); (Float, "y")], Float);
+        ("absi",  [(Int, "x")], Int);
+        ("absd",  [(Float, "x")], Float);
+        ("poweri",  [(Int, "x"); (Int, "y")], Int);
+        ("powerd",  [(Float, "x"); (Int, "y")], Float)]
+
+
+        
   in
 
   (* Add function name to symbol table *)
