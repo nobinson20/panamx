@@ -3,8 +3,8 @@ matrix eigen(double a, double b, double c) {
     double e1;
     double e2;
     vec = <1, 2>;
-    e1 = (-b+sqrt((b*b-4.0*a*c))) / (2.0 * a);
-    e2 = (-b-sqrt((b*b-4.0*a*c))) / (2.0 * a);
+    e1 = (-b+sqrtd((b*b-4.0*a*c))) / (2.0 * a);
+    e2 = (-b-sqrtd((b*b-4.0*a*c))) / (2.0 * a);
     vec[0][0] = e1;
     vec[0][1] = e2;
     return vec;

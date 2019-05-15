@@ -100,7 +100,7 @@ void printMatrix(matrix m) {
 
 void freeMatrix(matrix m) {
   for (int i = 0; i < m->row; i++)
-    free(m->mat[i]);
+  free(m->mat[i]);
   free(m->mat);
   free(m);
 }
@@ -561,12 +561,12 @@ void normalizeRow(matrix m, int row, int lead)
   double lv = drow[lead];
   if (fabs(lv) <= 0.00001) {
     if (lv < 0)
-      lv = -0.00001;
+    lv = -0.00001;
     else
-      lv = 0.00001;
+    lv = 0.00001;
   }
   for (int i = 0; i < m->col; i++)
-    drow[i] /= lv;
+  drow[i] /= lv;
 }
 
 // returns rref of given matrix m
@@ -622,76 +622,76 @@ double rank(matrix m) {
 }
 
 // Calculate square root of double
-double sqrt(double num) {
-    double guess, e, upperbound;
-    guess = 1;
-    e = 0.001;
-    do 
-    {
-        upperbound = num / guess;
-        guess = (upperbound + guess) / 2;
-    } while (!(guess * guess >= num - e && 
-               guess * guess <= num + e));
-    return guess;  
+double sqrtd(double num) {
+  double guess, e, upperbound;
+  guess = 1;
+  e = 0.001;
+  do {
+    upperbound = num / guess;
+    guess = (upperbound + guess) / 2;
+  } while (!(guess * guess >= num - e && guess * guess <= num + e));
+  return guess;
 }
+
+int sqrti(int x) {
+  return (int)sqrtd((double)x);
+}
+
 int absi(int N){
-	return ((N<0)?(-N):(N));	
+  return ((N<0)?(-N):(N));
 }
 
 double absd(double N){
-	return ((N<0)?(-N):(N));	
+  return ((N<0)?(-N):(N));
 }
 
-double poweri (int e, int x) {
-    int i;
-    int r = 1;
-    for (i = 0; i < e; i++) {
-        r *= x;
-    }
-    return r;
+double poweri(int e, int x) {
+  int i;
+  int r = 1;
+  for (i = 0; i < e; i++) {
+    r *= x;
+  }
+  return r;
 }
 
-
-double powerd (double e, int x) {
-    int i;
-    double r = 1;
-    for (i = 0; i < e; i++) {
-        r *= x;
-    }
-    return r;
-}
- 
-double nrooti (int n, int x) {
-    int d, r = 1;
-    if (!x) {
-        return 0;
-    }
-    if (n < 1 || (x < 0 && !(n&1))) {
-        return NAN;
-    }
-    do {
-        d = (x / poweri(r, n - 1) - r) / n;
-        r += d;
-    }
-    while (d >= DBL_EPSILON * 10 || d <= -DBL_EPSILON * 10);
-    return r;
+double powerd(double e, int x) {
+  int i;
+  double r = 1;
+  for (i = 0; i < e; i++) {
+    r *= x;
+  }
+  return r;
 }
 
-
-double nrootd (int n, double x) {
-    double d, r = 1;
-    if (!x) {
-        return 0;
-    }
-    if (n < 1 || (x < 0 && !(n&1))) {
-        return NAN;
-    }
-    do {
-        d = (x / powerd(r, n - 1) - r) / n;
-        r += d;
-    }
-    while (d >= DBL_EPSILON * 10 || d <= -DBL_EPSILON * 10);
-    return r;
+double nrooti(int n, int x) {
+  int d, r = 1;
+  if (!x) {
+    return 0;
+  }
+  if (n < 1 || (x < 0 && !(n&1))) {
+    return NAN;
+  }
+  do {
+    d = (x / poweri(r, n - 1) - r) / n;
+    r += d;
+  }
+  while (d >= DBL_EPSILON * 10 || d <= -DBL_EPSILON * 10);
+  return r;
 }
 
 
+double nrootd(int n, double x) {
+  double d, r = 1;
+  if (!x) {
+    return 0;
+  }
+  if (n < 1 || (x < 0 && !(n&1))) {
+    return NAN;
+  }
+  do {
+    d = (x / powerd(r, n - 1) - r) / n;
+    r += d;
+  }
+  while (d >= DBL_EPSILON * 10 || d <= -DBL_EPSILON * 10);
+  return r;
+}

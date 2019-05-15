@@ -183,14 +183,16 @@ let translate (globals, functions, structs) =
   let matrix_inv_func : L.llvalue =
     L.declare_function "inv" matrix_inv_t the_module in
 
-  let float_sqrt_t : L.lltype =
+  let int_sqrti_t : L.lltype =
+      L.function_type i32_t [| i32_t |] in
+  let int_sqrti_func : L.llvalue =
+      L.declare_function "sqrti" int_sqrti_t the_module in
+
+  let float_sqrtd_t : L.lltype =
       L.function_type float_t [| float_t |] in
-  let float_sqrt_func : L.llvalue =
-      L.declare_function "sqrtd" float_sqrt_t the_module in
-  
-  
-  
-  
+  let float_sqrtd_func : L.llvalue =
+      L.declare_function "sqrtd" float_sqrtd_t the_module in
+
   let nrooti_t : L.lltype =
       L.function_type i32_t [| i32_t ; i32_t |] in
   let nrooti_func : L.llvalue =
@@ -200,7 +202,7 @@ let translate (globals, functions, structs) =
       L.function_type i32_t [| i32_t ; float_t |] in
   let nrootd_func : L.llvalue =
       L.declare_function "nrootd" nrootd_t the_module in
-  
+
   let absi_t : L.lltype =
       L.function_type i32_t [| i32_t |] in
   let absi_func : L.llvalue =
@@ -210,20 +212,16 @@ let translate (globals, functions, structs) =
       L.function_type float_t [| float_t |] in
   let absd_func : L.llvalue =
       L.declare_function "absd" absd_t the_module in
-  
+
   let poweri_t : L.lltype =
       L.function_type i32_t [| i32_t ; i32_t |] in
   let poweri_func : L.llvalue =
       L.declare_function "poweri" poweri_t the_module in
-  
+
   let powerd_t : L.lltype =
       L.function_type float_t [| float_t ; i32_t|] in
   let powerd_func : L.llvalue =
       L.declare_function "powerd" powerd_t the_module in
-
-
-
-
 
 
   (* Define each function (arguments and return type) so we can
@@ -503,39 +501,22 @@ let translate (globals, functions, structs) =
       | SCall ("inv", [e]) ->
         L.build_call matrix_inv_func [| expr builder e |] "matrix_inv" builder
 
-      | SCall ("sqrt", [e]) ->
-        L.build_call float_sqrt_func [| expr builder e |] "float_sqrt" builder
-      
+      | SCall ("sqrti", [e]) ->
+        L.build_call int_sqrti_func [| expr builder e |] "int_sqrti" builder
+      | SCall ("sqrtd", [e]) ->
+        L.build_call float_sqrtd_func [| expr builder e |] "float_sqrtd" builder
       | SCall ("nrooti", [e1;e2]) ->
         L.build_call nrooti_func [| expr builder e1; expr builder e2 |] "nrooti" builder
-
       | SCall ("nrootd", [e1;e2]) ->
         L.build_call nrootd_func [| expr builder e1; expr builder e2 |] "nrooti" builder
-
       | SCall ("absi", [e]) ->
         L.build_call absi_func [| expr builder e |] "absi" builder
-
       | SCall ("absd", [e]) ->
         L.build_call absd_func [| expr builder e|] "absd" builder
-
       | SCall ("poweri", [e1;e2]) ->
         L.build_call poweri_func [| expr builder e1; expr builder e2 |] "poweri" builder
-
       | SCall ("powerd", [e1;e2]) ->
         L.build_call powerd_func [| expr builder e1; expr builder e2 |] "powerd" builder
-
-
-
-
-
-
-
-
-
-
- 
-
-
 
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
