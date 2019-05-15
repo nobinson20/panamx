@@ -621,6 +621,10 @@ double rank(matrix m) {
   return rnk;
 }
 
+// concats top bot matrices
+
+// concats left right matrices
+
 // Calculate square root of double
 double sqrtd(double num) {
   double guess, e, upperbound;
