@@ -5,13 +5,10 @@
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
 
-only_px_tests="tests2/px_tests/test-*.px"
-only_mc_tests="tests2/mc_tests/test-*.px tests2/mc_tests/fail-*.px"
-demo_tests="tests2/demos/test-*.px"
-all_tests="tests2/demos/test-*.px tests2/px_tests/test-*.px tests2/mc_tests/test-*.px tests2/mc_tests/fail-*.px"
+demos="tests2/demos/test-*.px"
 
 # Change this line to set directories
-setdirs=$all_tests
+setdirs=$demos
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"

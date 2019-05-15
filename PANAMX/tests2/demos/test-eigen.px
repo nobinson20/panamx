@@ -1,0 +1,31 @@
+matrix eigen(double a, double b, double c) {
+    matrix vec;
+    double e1;
+    double e2;
+    vec = <1, 2>;
+    e1 = (-b+sqrt((b*b-4.0*a*c))) / (2.0 * a);
+    e2 = (-b-sqrt((b*b-4.0*a*c))) / (2.0 * a);
+    vec[0][0] = e1;
+    vec[0][1] = e2;
+    return vec;
+}
+
+int main() {
+    matrix A;
+    double a;
+    double b;
+    double c;
+    matrix eigenvec;
+    A = [3, 2;
+         1, 4];
+
+    a = 1.0;
+    b = -A[0][0] - A[1][1];
+    c = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+
+    eigenvec = eigen(a, b, c);
+
+    prints("Eigenvalues:");
+    printm(eigenvec);
+    return 0;
+}

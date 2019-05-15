@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Add customized test file here
-files="tests2/px_tests/test-eigen.px"
+files="tests2/demo/test-perceptron.px"
 
 # Path to the LLVM interpreter
 LLI="/usr/local/opt/llvm/bin/lli"
