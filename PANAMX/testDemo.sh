@@ -100,7 +100,8 @@ Check() {
     Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
     Run "$CC" "-o" "${basename}.exe" "${basename}.s" "matrix.o" &&
     Run "./${basename}.exe" > "${basename}.out" &&
-    Compare ${basename}.out ${reffile}.out ${basename}.diff
+    Compare ${basename}.out ${reffile}.out ${basename}.diff &&
+    Run "./${basename}.exe"
 
     # Report the status and clean up the generated files
 

@@ -68,8 +68,11 @@ int main() {
     b = comb[0:3][3:4];
     x = solve(A, b);
 
+    prints("Matrix A:");
     printm(A);
+    prints("Matrix B:");
     printm(b);
+    prints("Solve for x:");
     printm(x);
 
     return 0;
