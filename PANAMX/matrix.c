@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <float.h>
 
 typedef struct Matrix {
   int row;
@@ -621,6 +622,76 @@ double rank(matrix m) {
 }
 
 // Calculate square root of double
-double sqrtd(double x) {
-  return sqrt(x);
+double sqrt(double num) {
+    double guess, e, upperbound;
+    guess = 1;
+    e = 0.001;
+    do 
+    {
+        upperbound = num / guess;
+        guess = (upperbound + guess) / 2;
+    } while (!(guess * guess >= num - e && 
+               guess * guess <= num + e));
+    return guess;  
 }
+int absi(int N){
+	return ((N<0)?(-N):(N));	
+}
+
+double absd(double N){
+	return ((N<0)?(-N):(N));	
+}
+
+double poweri (int e, int x) {
+    int i;
+    int r = 1;
+    for (i = 0; i < e; i++) {
+        r *= x;
+    }
+    return r;
+}
+
+
+double powerd (double e, int x) {
+    int i;
+    double r = 1;
+    for (i = 0; i < e; i++) {
+        r *= x;
+    }
+    return r;
+}
+ 
+double nrooti (int n, int x) {
+    int d, r = 1;
+    if (!x) {
+        return 0;
+    }
+    if (n < 1 || (x < 0 && !(n&1))) {
+        return NAN;
+    }
+    do {
+        d = (x / poweri(r, n - 1) - r) / n;
+        r += d;
+    }
+    while (d >= DBL_EPSILON * 10 || d <= -DBL_EPSILON * 10);
+    return r;
+}
+
+
+double nrootd (int n, double x) {
+    double d, r = 1;
+    if (!x) {
+        return 0;
+    }
+    if (n < 1 || (x < 0 && !(n&1))) {
+        return NAN;
+    }
+    do {
+        d = (x / powerd(r, n - 1) - r) / n;
+        r += d;
+    }
+    while (d >= DBL_EPSILON * 10 || d <= -DBL_EPSILON * 10);
+    return r;
+}
+
+

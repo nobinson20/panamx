@@ -187,6 +187,44 @@ let translate (globals, functions, structs) =
       L.function_type float_t [| float_t |] in
   let float_sqrt_func : L.llvalue =
       L.declare_function "sqrtd" float_sqrt_t the_module in
+  
+  
+  
+  
+  let nrooti_t : L.lltype =
+      L.function_type i32_t [| i32_t ; i32_t |] in
+  let nrooti_func : L.llvalue =
+      L.declare_function "nrooti" nrooti_t the_module in
+
+  let nrootd_t : L.lltype =
+      L.function_type i32_t [| i32_t ; float_t |] in
+  let nrootd_func : L.llvalue =
+      L.declare_function "nrootd" nrootd_t the_module in
+  
+  let absi_t : L.lltype =
+      L.function_type i32_t [| i32_t |] in
+  let absi_func : L.llvalue =
+      L.declare_function "absi" absi_t the_module in
+
+  let absd_t : L.lltype =
+      L.function_type float_t [| float_t |] in
+  let absd_func : L.llvalue =
+      L.declare_function "absd" absd_t the_module in
+  
+  let poweri_t : L.lltype =
+      L.function_type i32_t [| i32_t ; i32_t |] in
+  let poweri_func : L.llvalue =
+      L.declare_function "poweri" poweri_t the_module in
+  
+  let powerd_t : L.lltype =
+      L.function_type float_t [| float_t ; i32_t|] in
+  let powerd_func : L.llvalue =
+      L.declare_function "powerd" powerd_t the_module in
+
+
+
+
+
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
@@ -467,6 +505,36 @@ let translate (globals, functions, structs) =
 
       | SCall ("sqrt", [e]) ->
         L.build_call float_sqrt_func [| expr builder e |] "float_sqrt" builder
+      
+      | SCall ("nrooti", [e1;e2]) ->
+        L.build_call nrooti_func [| expr builder e1; expr builder e2 |] "nrooti" builder
+
+      | SCall ("nrootd", [e1;e2]) ->
+        L.build_call nrootd_func [| expr builder e1; expr builder e2 |] "nrooti" builder
+
+      | SCall ("absi", [e]) ->
+        L.build_call absi_func [| expr builder e |] "absi" builder
+
+      | SCall ("absd", [e]) ->
+        L.build_call absd_func [| expr builder e|] "absd" builder
+
+      | SCall ("poweri", [e1;e2]) ->
+        L.build_call poweri_func [| expr builder e1; expr builder e2 |] "poweri" builder
+
+      | SCall ("powerd", [e1;e2]) ->
+        L.build_call powerd_func [| expr builder e1; expr builder e2 |] "powerd" builder
+
+
+
+
+
+
+
+
+
+
+ 
+
 
 
       | SCall (f, args) ->
