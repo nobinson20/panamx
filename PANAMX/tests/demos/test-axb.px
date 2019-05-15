@@ -50,8 +50,9 @@ int main() {
     e3 = [2, 5, -1, 27];
 
     // Combine into 3 X 4 matrix
-    comb = combineTopDown(e1, e2);
-    comb = combineTopDown(comb, e3);
+
+    comb = concatTB(e1, e2);
+    comb = concatTB(comb, e3);
 
     // Slice matrix
     A = comb[0:3][0:3];
