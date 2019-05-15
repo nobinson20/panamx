@@ -82,7 +82,7 @@ double matrixAssign(matrix m, int i, int j, double val) {
 }
 
 void printMatrix(matrix m) {
-  if (m == NULL || m->mat == NULL) {
+  if (m->row == 0 || m->col == 0) {
     printf("Empty Matrix\n");
   }
   else {
