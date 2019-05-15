@@ -36,16 +36,6 @@ matrix combineTopDown(matrix a, matrix b) {
 }
 
 int main() {
-  /*  matrix A;
-    matrix b;
-    matrix x;
-    A = [1, 1, 1;
-         0, 2, 5;
-         2, 5, -1];
-    b = [6;
-         -4;
-         27]; */
-
     matrix e1;
     matrix e2;
     matrix e3;

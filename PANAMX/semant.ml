@@ -54,6 +54,8 @@ let check (globals, functions, structs) =
         ("rank",   [(Matrix, "x")], Float);
         ("det",    [(Matrix, "x")], Float);
         ("inv",    [(Matrix, "x")], Matrix);
+        ("concatTB", [(Matrix, "x"); (Matrix, "y")], Matrix);
+        ("concatLR", [(Matrix, "x"); (Matrix, "y")], Matrix);
         ("sqrti",  [(Int, "x")], Int);
         ("sqrtd",  [(Float, "x")], Float);
         ("nrooti",  [(Int, "x"); (Int, "y")], Int);
