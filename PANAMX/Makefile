@@ -1,11 +1,4 @@
-# "make test" Compiles everything and runs the regression tests
-
-# .PHONY : test
-# test : all testall.sh
-# 	./testall.sh
-
-# "make all" builds the executable as well as the "printbig" library designed
-# to test linking external code
+# "make all" builds the executable
 
 .PHONY : all
 all : panamx.native matrix.o
@@ -21,46 +14,20 @@ panamx.native :
 	opam config exec -- \
 	ocamlbuild -use-ocamlfind panamx.native
 
+# "make test" Compiles everything and runs the regression tests
+
+.PHONY : test
+test : all testall.sh
+	./testall.sh
+
 # "make clean" removes all generated files
 
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff matrix.o *.ll *.out *.exe *.s
-
-# Testing the "printbig" example
-
-# printbig : printbig.c
-# 	cc -o printbig -DBUILD_TEST printbig.c
+	rm -rf testall.log ocamlllvm *.diff matrix.o *.ll *.out *.exe *.s *.err
 
 # Link the matrix.c to llvm
 
 matrix : matrix.c
 	cc -o matrix -DBUILD_TEST matrix.c
-
-# Building the tarball
-
-TESTS = \
-  add1 arith1 arith2 arith3 fib float1 float2 float3 for1 for2 func1 \
-  func2 func3 func4 func5 func6 func7 func8 func9 gcd2 gcd global1 \
-  global2 global3 hello if1 if2 if3 if4 if5 if6 local1 local2 ops1 \
-  ops2 printbig var1 var2 while1 while2 printhelloworld incdec ops3
-
-FAILS = \
-  assign1 assign2 assign3 dead1 dead2 expr1 expr2 expr3 float1 float2 \
-  for1 for2 for3 for4 for5 func1 func2 func3 func4 func5 func6 func7 \
-  func8 func9 global1 global2 if1 if2 if3 nomain printbig printb print \
-  return1 return2 while1 while2 printhelloworld incdec ops3
-
-TESTFILES = $(TESTS:%=test-%.px) $(TESTS:%=test-%.out) \
-	    $(FAILS:%=fail-%.px) $(FAILS:%=fail-%.err)
-
-TARFILES = ast.ml sast.ml codegen.ml Makefile _tags panamx.ml parser.mly \
-	README scanner.mll semant.ml testall.sh \
-	printbig.c arcade-font.pbm font2c \
-	Dockerfile \
-	$(TESTFILES:%=tests/%)
-
-panamx.tar.gz : $(TARFILES)
-	cd .. && tar czf panamx/panamx.tar.gz \
-		$(TARFILES:%=panamx/%)

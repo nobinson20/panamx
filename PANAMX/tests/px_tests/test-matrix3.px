@@ -9,8 +9,8 @@ int main() {
     mat[1][1] = 5.5;
     mat[1][2] = 666;
     prints("matrix height:");
-    print(mat.height);
+    print(matrixHeight(mat));
     prints("matrix width:");
-    print(mat.width);
+    print(matrixWidth(mat));
     return 0;
 }

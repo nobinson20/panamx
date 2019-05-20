@@ -1,0 +1,6 @@
+int main()
+{
+  matrix m;
+  m = [1, 2; 3, 4];
+  printf(m[0.0]["one"]); /* this should fail because indexes can only be integers */
+}

@@ -1,0 +1,6 @@
+int main(){
+  matrix m;
+  m = ["s", 3.3;
+       2.3, 3.4]; /* this should fail because matrix elements can only be int/double */
+  return 0;
+}

@@ -1,0 +1,13 @@
+struct Node {
+    matrix x;
+};
+
+struct Node {
+    matrix y; /* this should fail because this is a duplicate struct with same name */
+};
+
+int main() {
+    struct Node p;
+    p = <struct Node>;
+    return 0;
+}

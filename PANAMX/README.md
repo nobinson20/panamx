@@ -1,8 +1,9 @@
-The MicroC compiler
+The PANAMX compiler
 
-Coded in OCaml, this takes a highly stripped-down subset of C (ints,
-bools, and void types, arithmetic, if-else, for, and while statements,
-and user-defined functions) and compiles it into LLVM IR.
+PANAMX is matrix manipulation language.
+As a programming language, it allows common mathematical functions, matrix manipulations,
+matrix functions, and user defined data structures called structs.
+Our goal is to make it as an intuitive, and versatile language where the basic syntax is similar to that of C/C++.
 
 It needs the OCaml llvm library, which is most easily installed through opam.
 
@@ -10,251 +11,222 @@ Install LLVM and its development libraries, the m4 macro preprocessor,
 and opam, then use opam to install llvm.
 
 The version of the OCaml llvm library must match the version of the LLVM
-system installed on your system.
+system installed on your system. At the time of the development, we use
+ocaml 4.07.1 and llvm 8.0.0.
 
-In addition to print, which calls the C library function printf(),
-microc gratuitiously includes a primitive function "printbig," which
-prints large ASCII-encoded characters.
-
-The stock C compiler compiles printbig.o.  testall.sh runs the microc
-executable on each testcase (.mc file) to produce a .ll file, invokes
+testall.sh runs the PANAMX
+executable on each testcase (.txt file) to produce a .ll file, invokes
 "llc" (the LLVM compiler) to produce a .s (assembly) file, then
-invokes "cc" (the stock C compiler) to assemble the .s file, link in
-printbig.o, and generate an executable.  See testall.sh for details.
-----------
-If you get errors about llvm.analysis not being found, it's probably
-because opam enviroment information is missing.  Either run
-
-eval $(opam config env)
-
-or run ocamlbuild like this:
-
-opam config exec -- ocamlbuild <args>
-------------------------------
-Using Docker
-
-* Install Docker on whatever operating system you're on
-
-   Under Ubuntu,
-   apt install docker.io
-
-* Test your installation
-
-   docker run hello-world
-
-  If this fails, you will need to correct your installation.
-
-  Under Ubuntu, add yourself to the "docker" group:
-  
-  sudo usermod -aG docker <username>
-
-* Move to where you unpacked the microc source:
-
-  cd microc
-
-* Invoke docker
-
-  docker run --rm -it -v `pwd`:/home/microc -w=/home/microc columbiasedwards/plt
-
-* Inside docker, compile MicroC and run the regression tests:
-
-  # make
-  ...
-  test-add1...OK
-  test-arith1...OK
-  test-arith2...OK
-  test-arith3...OK
-  ... etc.
-
-  # make clean
-
-------------------------------
-Installation under Ubuntu 16.04
-
-LLVM 3.8 is the default under 16.04. Install the matching version of
-the OCaml LLVM bindings:
-
-sudo apt install ocaml llvm llvm-runtime m4 opam
-opam init
-opam install llvm.3.8
-eval `opam config env`
-
-make
-./testall.sh
-
-------------------------------
-Installation under Ubuntu 15.10
-
-LLVM 3.6 is the default under 15.10, so we ask for a matching version of the
-OCaml library.
-
-sudo apt-get install -y ocaml m4 llvm opam
-opam init
-opam install llvm.3.6 ocamlfind
-eval `opam config env`
-
-make
-./testall.sh
-
-------------------------------
-Installation under Ubuntu 14.04
-
-The default LLVM package is 3.4, so we install the matching OCaml
-library using opam.  The default version of opam under 14.04 is too
-old; we need to use a newer package.
-
-sudo apt-get install m4 llvm software-properties-common
-
-sudo add-apt-repository --yes ppa:avsm/ppa
-sudo apt-get update -qq
-sudo apt-get install -y opam
-opam init
-
-eval `opam config env`
-
-opam install llvm.3.4 ocamlfind
-
-------------------------------
-Installation under OS X
-
-1. Install Homebrew:
-
-   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-2. Verify Homebrew is installed correctly:
-
-   brew doctor
-
-3. Install opam:
-
-   brew install opam
-
-4. Set up opam:
-
-   opam init
-
-5. Install llvm:
-
-   brew install llvm
-
-   Take note of where brew places the llvm executables. It will show
-   you the path to them under the CAVEATS section of the post-install
-   terminal output. For me, they were in /usr/local/opt/llvm/bin. Also
-   take note of the llvm version installed. For me, it was 3.6.2.
-
-6. Have opam set up your enviroment:
-
-   eval `opam config env`
-
-7. Install the OCaml llvm library:
-
-   opam install llvm.3.6 
-
-   Ensure that the version of llvm you install here matches the
-   version you installed via brew. Brew installed llvm version 3.6.2,
-   so I install llvm.3.6 with opam.
-
-   IF YOU HAVE PROBLEMS ON THIS STEP, it's probably because you are
-   missing some external dependencies. Ensure that libffi is installed
-   on your machine. It can be installed with
-
-   brew install libffi
-
-   If, after this, opam install llvm.3.6 is still not working, try
-   running
-
-   opam list --external --required-by=llvm.3.6
-
-   This will list all of the external dependencies required by
-   llvm.3.6. Install all the dependencies listed by this command.
-
-   IF THE PREVIOUS STEPS DO NOT SOLVE THE ISSUE, it may be a problem
-   with using your system's default version of llvm. Install a
-   different version of llvm and opam install llvm with that version
-   by running:
-
-   brew install homebrew/versions/llvm37
-   opam install llvm.3.7
-
-   Where the number at the end of both commands is a version different 
-   from the one your system currently has.
-
-8. Make sure testall.sh can access lli and llc
-  
-   Modify the definition of LLI and LLC in testall.sh to point to the absolute
-   path, e.g., LLI="/usr/local/opt/llvm/bin/lli"
-
-   - OR -
-
-   Update your path, e.g.,
-   
-   export PATH=$PATH:/usr/local/opt/llvm/bin
-
-   - OR -
-   
-   Create a symbolic link to the lli command:
-
-   sudo ln -s /usr/local/opt/llvm/bin/lli /usr/bin/lli
-
-   Create the symlink from wherever brew installs the llvm executables
-   and place it in your bin. From step 5, I know that brew installed
-   the lli executable in the folder, /usr/local/opt/llvm/bin/, so this
-   is where I symlink to. Brew might install the lli executables in a
-   different location for you, so make sure you symlink to the right
-   directory.
-
-   IF YOU GET OPERATION NOT PERMITTED ERROR, then this is probably a
-   result of OSX's System Integrity Protection. 
-
-   One way to get around this is to reboot your machine into recovery
-   mode (by holding cmd-r when restarting). Open a terminal from
-   recovery mode by going to Utilities -> Terminal, and enter the
-   following commands:
-
-   csrutil disable
-   reboot
-   
-   After your machine has restarted, try the `ln....` command again,
-   and it should succeed.
-
-   IMPORTANT: the prevous step disables System Integrity Protection,
-   which can leave your machine vulnerable. It's highly advisable to
-   reenable System Integrity Protection when you are done by 
-   rebooting your machine into recovery mode and entering the following
-   command in the terminal:
-
-   csrutil enable
-   reboot
-
-9. To run and test, navigate to the MicroC folder. Once there, run
-
-   make ; ./testall.sh
-
-   MicroC should build without any complaints and all tests should
-   pass.
-
-   IF RUNNING ./testall.sh FAILS ON SOME TESTS, check to make sure you
-   have symlinked the correct executable from your llvm installation.
-   For example, if the executable is named lli-[version], then the 
-   previous step should have looked something like:
-
-   sudo ln -s /usr/local/opt/llvm/bin/lli-3.7 /usr/bin/lli   
-
-   As before, you may also modify the path to lli in testall.sh
+invokes "cc" (the stock C compiler) to assemble the .s file,
+and generate an executable.  See testall.sh for details.
 
 ------------------------------
 To run and test:
 
-$ make
-ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 microc.native
-Finished, 22 targets (0 cached) in 00:00:01.
-cc    -c -o printbig.o printbig.c
-$ ./testall.sh
-test-arith1...OK
-test-arith2...OK
-test-arith3...OK
-test-fib...OK
-...
-fail-while1...OK
-fail-while2...OK
+$make
+opam config exec -- \
+	ocamlbuild -use-ocamlfind panamx.native
+Finished, 25 targets (0 cached) in 00:00:03.
+cc    -c -o matrix.o matrix.c
 
+$./testall.sh
+-n test-axb...
+OK
+-n test-eigen...
+OK
+-n test-perceptron...
+OK
+-n test-structMatrix...
+OK
+-n test-incdec...
+OK
+-n test-matrix1...
+OK
+-n test-matrix2...
+OK
+-n test-matrix3...
+OK
+-n test-matrix4...
+OK
+-n test-matrix5...
+OK
+-n test-matrix6...
+OK
+-n test-matrixDet...
+OK
+-n test-matrixFunc...
+OK
+-n test-matrixInv...
+OK
+-n test-matrixRREF...
+OK
+-n test-matrixSlice1...
+OK
+-n test-matrixTest...
+OK
+-n test-ops3...
+OK
+-n test-printTest...
+OK
+-n test-printstr...
+OK
+-n test-struct1...
+OK
+-n test-structStruct...
+OK
+-n fail-matrixDim...
+OK
+-n fail-matrixIndex...
+OK
+-n fail-matrixTypeAssign...
+OK
+-n fail-structAssign...
+OK
+-n fail-structDup...
+OK
+-n test-add1...
+OK
+-n test-arith1...
+OK
+-n test-arith2...
+OK
+-n test-arith3...
+OK
+-n test-fib...
+OK
+-n test-float1...
+OK
+-n test-float2...
+OK
+-n test-float3...
+OK
+-n test-for1...
+OK
+-n test-for2...
+OK
+-n test-func1...
+OK
+-n test-func2...
+OK
+-n test-func3...
+OK
+-n test-func4...
+OK
+-n test-func5...
+OK
+-n test-func6...
+OK
+-n test-func7...
+OK
+-n test-func8...
+OK
+-n test-func9...
+OK
+-n test-gcd...
+OK
+-n test-gcd2...
+OK
+-n test-global1...
+OK
+-n test-global2...
+OK
+-n test-global3...
+OK
+-n test-hello...
+OK
+-n test-if1...
+OK
+-n test-if2...
+OK
+-n test-if3...
+OK
+-n test-if4...
+OK
+-n test-if5...
+OK
+-n test-if6...
+OK
+-n test-local1...
+OK
+-n test-local2...
+OK
+-n test-ops1...
+OK
+-n test-ops2...
+OK
+-n test-var1...
+OK
+-n test-var2...
+OK
+-n test-while1...
+OK
+-n test-while2...
+OK
+-n fail-assign1...
+OK
+-n fail-assign2...
+OK
+-n fail-assign3...
+OK
+-n fail-dead1...
+OK
+-n fail-dead2...
+OK
+-n fail-expr1...
+OK
+-n fail-expr2...
+OK
+-n fail-float1...
+OK
+-n fail-float2...
+OK
+-n fail-for1...
+OK
+-n fail-for2...
+OK
+-n fail-for3...
+OK
+-n fail-for4...
+OK
+-n fail-for5...
+OK
+-n fail-func1...
+OK
+-n fail-func2...
+OK
+-n fail-func3...
+OK
+-n fail-func4...
+OK
+-n fail-func5...
+OK
+-n fail-func6...
+OK
+-n fail-func7...
+OK
+-n fail-func8...
+OK
+-n fail-func9...
+OK
+-n fail-global1...
+OK
+-n fail-global2...
+OK
+-n fail-if1...
+OK
+-n fail-if2...
+OK
+-n fail-if3...
+OK
+-n fail-print...
+OK
+-n fail-printb...
+OK
+-n fail-return1...
+OK
+-n fail-return2...
+OK
+-n fail-while1...
+OK
+-n fail-while2...
+OK
