@@ -73,11 +73,6 @@ let translate (globals, functions, structs) =
   let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
 
-  (* let printbig_t : L.lltype =
-      L.function_type i32_t [| i32_t |] in
-  let printbig_func : L.llvalue =
-      L.declare_function "printbig" printbig_t the_module in *)
-
   let build_matrix_empty_t : L.lltype =
       L.function_type matrix_t [| i32_t; i32_t |] in
   let build_matrix_empty_func : L.llvalue =
@@ -453,28 +448,6 @@ let translate (globals, functions, structs) =
             | _ -> raise (Failure "decrement error"))) builder
           )
       | SCall ("print", [e])
-        (* -> let expr_val = expr builder e in
-        (match e with ((typ, _) : sexpr) ->
-           (match typ with
-            | A.Matrix -> L.build_call print_matrix_func [| expr_val |] "print_matrix" builder
-            | A.Int | A.Bool -> L.build_call printf_func [| int_format_str ; (expr_val) |]
-                                  "printf" builder
-            | A.Float -> L.build_call printf_func [| float_format_str ; (expr_val) |]
-                           "printf" builder
-            | A.String -> L.build_call printf_func [| string_format_str; (expr builder e) |]
-                            "printf" builder
-            | A.Void -> raise (Failure ("Void type cannot be printed"))
-            | _ -> raise (Failure ("cannot print"))
-           )) *)
-          (* (match tt with
-            A.Int
-          | A.Bool -> L.build_call printf_func
-              [| int_format_str ; (expr builder e) |] "printf" builder
-          | A.Float -> L.build_call printf_func
-              [| float_format_str ; (expr builder e) |] "printf" builder
-          | A.String -> L.build_call printf_func
-              [| string_format_str; (expr builder e) |] "printf" builder
-             | _ -> raise (Failure "cannot print")) *)
       | SCall ("printb", [e]) ->
 	      L.build_call printf_func [| int_format_str ; (expr builder e) |]
           "printf" builder

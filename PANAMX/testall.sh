@@ -5,10 +5,11 @@
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
 
-only_px_tests="tests/px_tests/test-*.px"
-only_mc_tests="tests/mc_tests/test-*.px tests/mc_tests/fail-*.px"
+px_tests="tests/px_tests/test-*.px"
+mc_tests="tests/mc_tests/test-*.px tests/mc_tests/fail-*.px"
 demo_tests="tests/demos/test-*.px"
-all_tests="tests/demos/test-*.px tests/px_tests/test-*.px tests/mc_tests/test-*.px tests/mc_tests/fail-*.px"
+fails_tests="tests/px_fails/fail-*.px"
+all_tests="tests/demos/test-*.px tests/px_tests/test-*.px tests/px_fails/fail-*.px tests/mc_tests/test-*.px tests/mc_tests/fail-*.px"
 
 # Change this line to set directories
 setdirs=$all_tests

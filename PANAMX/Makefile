@@ -1,11 +1,4 @@
-# "make test" Compiles everything and runs the regression tests
-
-# .PHONY : test
-# test : all testall.sh
-# 	./testall.sh
-
-# "make all" builds the executable as well as the "printbig" library designed
-# to test linking external code
+# "make all" builds the executable
 
 .PHONY : all
 all : panamx.native matrix.o
@@ -21,17 +14,18 @@ panamx.native :
 	opam config exec -- \
 	ocamlbuild -use-ocamlfind panamx.native
 
+# "make test" Compiles everything and runs the regression tests
+
+.PHONY : test
+test : all testall.sh
+	./testall.sh
+
 # "make clean" removes all generated files
 
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff matrix.o *.ll *.out *.exe *.s
-
-# Testing the "printbig" example
-
-# printbig : printbig.c
-# 	cc -o printbig -DBUILD_TEST printbig.c
+	rm -rf testall.log ocamlllvm *.diff matrix.o *.ll *.out *.exe *.s *.err
 
 # Link the matrix.c to llvm
 
