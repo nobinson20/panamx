@@ -1,9 +1,0 @@
-int main() {
-    matrix m;
-    m = [1.6, 3.9;
-         2.4, 4.3;
-         5.7];
-    printm(m);
-    return 0;
-}
-
